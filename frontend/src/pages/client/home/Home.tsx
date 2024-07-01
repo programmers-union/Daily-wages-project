@@ -3,7 +3,7 @@ import Banner from '../../../components/client/home/Banner'
 
 const Home:React.FC = () => {
   return (
-    <div>
+    <div >
       <Banner />
     </div>
   )
