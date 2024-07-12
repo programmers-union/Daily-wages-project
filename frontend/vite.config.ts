@@ -7,4 +7,5 @@ export default defineConfig({
     include: ['moment', 'react-big-calendar'],
   },
   plugins: [react()],
+  
 })

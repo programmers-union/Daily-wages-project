@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-// import calVideo from "../../../assets/Screen Recording 2024-07-03 131739.mp4";
+// import calVideo from "../../assets/Screen Recording 2024-07-03 131739.mp4";
 import calendarS from '../../assets/calendarS.png'
+import { Link } from "react-router-dom";
 
 const ScheduleSection: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -83,9 +84,11 @@ const ScheduleSection: React.FC = () => {
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis
           aspernatur est distinctio voluptas doloribus modi!
         </p>
+        <Link to='/worker-calendar'>
         <button className="px-6 py-1 bg-custom-gradient text-sm border rounded-full mt-6">
           Schedule
         </button>
+        </Link>
       </div>
     </div>
   );
