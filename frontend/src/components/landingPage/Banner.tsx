@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../header/LandingNavBar";
+import { Link } from "react-router-dom";
 
 const Banner: React.FC = () => {
   const [index, setIndex] = useState(0);
@@ -41,9 +42,11 @@ const Banner: React.FC = () => {
           </div>
         </div>
         <div className="px-5 pt-3 flex justify-center items-center  ">
+          <Link to='/worker-form' >
           <p className="text-sm px-6 bg-custom-gradient py-2 border-b rounded-full  text-[#3a3a3a] hover:cursor-pointer font-normal ">
             Become a daily wager
           </p>
+          </Link>
         </div>
       </div>
       <style>{`

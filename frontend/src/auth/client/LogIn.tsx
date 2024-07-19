@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import AuthContext from "../../context/modules/AuthContext";
 import { AuthContextProps, EmailData, EmailPasswordData } from '../../types/authTypes/AuthTypes';
 import AuthError from "../../components/error/AuthError";
+import { Link } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [isActive, setIsActive] = useState(false);
@@ -45,7 +46,10 @@ const Login: React.FC = () => {
       setIsActive(true);
     }
   }, [loginEmailTrue]);
-
+  const handleLogin = () => {
+    console.log('google login ')
+    window.location.href = 'http://localhost:5000/api/auth/google';
+  };
   return (
     <div className="">
       <div className="flex items-center justify-center min-h-screen">
@@ -92,7 +96,12 @@ const Login: React.FC = () => {
                     required
                   />
                 </div>
+                <div className="flex justify-between items-center">
+                  <Link to='/forgot-password'>
+                <h6 className="text-blue-600 underline text-xs">Forgotten your password?</h6>
+                  </Link>
                 {isActive && <AuthError item={error} />}
+                </div>
               </>
             )}
             <div className="my-6">
@@ -118,7 +127,8 @@ const Login: React.FC = () => {
               />
               Continue with Apple
             </button>
-            <button className="bg-black w-full justify-center text-white text-[12px] helvetic py-2 px-4 rounded flex items-center">
+            <button 
+            onClick={handleLogin} className="bg-black w-full justify-center text-white text-[12px] helvetic py-2 px-4 rounded flex items-center">
               <img
                 src="https://cdn-icons-png.flaticon.com/128/281/281764.png"
                 alt="Google Logo"

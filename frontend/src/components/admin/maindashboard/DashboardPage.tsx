@@ -1,13 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react';
 import MainCategory from '../category/MainCategory';
+import AddNewCategory from '../category/AddNewCategory';
+// import { FormProgressProps } from '../../../types/AdminGategoryType';
 
-const DashboardPage:React.FC = () => {
+const DashboardPage: React.FC = () => {
+    const [activeAddCategoryPopup, setActiveAddCategoryPopup] = useState<boolean>(false);
+    
     const sideNav = [
         'Dashboard',
         'Reports',
         'Charts',
         'Products',
-        'category',
+        'Category',
         'Inbox',
         'Settings'
     ];
@@ -38,6 +42,7 @@ const DashboardPage:React.FC = () => {
     ];
       
     return (
+        <>
         <div className='min-w-[1024px] flex content-center sm:max-w-screen-xl mx-auto'>
             <div className="one w-[240px] bg-slate-100 px-2 pl-5 h-screen py-3 fixed top-0 left-0">
                 <div className="store text-blue-800 font-medium px-1 py-2 mb-3">
@@ -105,10 +110,12 @@ const DashboardPage:React.FC = () => {
                         </ul>
                     </div>
                 </nav>
-              <MainCategory />
+              <MainCategory setActiveAddCategoryPopup={setActiveAddCategoryPopup} />
             </section>
         </div>
-    )
-}
+        {activeAddCategoryPopup && <AddNewCategory setActiveAddCategoryPopup={setActiveAddCategoryPopup} />}
+        </>
+    );
+};
 
-export default DashboardPage
+export default DashboardPage;

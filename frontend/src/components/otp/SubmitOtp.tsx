@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef, useContext } from "react";
 import { UseOtp } from "../../context/modules/UseOtp";
 import AuthContext from "../../context/modules/AuthContext";
 import { AuthContextProps } from "../../types/authTypes/AuthTypes";
-import { OtpAndSignupType } from "../../types/Otp";
+import { OtpAndSignupType, OtpContextType } from "../../types/Otp";
+import { OtpContext } from "../../context/modules/OtpContext";
 
 const OtpPage: React.FC = () => {
   const [otpData, setOtpData] = useState<string[]>(Array(6).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(60);
-  // const [isActive , setIsActive] = useState(false)
 
   useEffect(() => {
     if (inputRefs.current[0]) {
@@ -22,16 +22,12 @@ const OtpPage: React.FC = () => {
   ) => {
     const value = e.target.value;
 
-    // Update otpData
     const newOtpData = [...otpData];
     newOtpData[index] = value;
     setOtpData(newOtpData);
 
-    if (value.length === 1) {
-      // Move focus to the next input if available
-      if (index < inputRefs.current.length - 1) {
-        inputRefs.current[index + 1]?.focus();
-      }
+    if (value.length === 1 && index < inputRefs.current.length - 1) {
+      inputRefs.current[index + 1]?.focus();
     }
   };
 
@@ -52,9 +48,10 @@ const OtpPage: React.FC = () => {
     }
   };
 
-  const { OTPSubmit , OTPReset } = UseOtp();
+  const { OTPSubmit, OTPReset } = UseOtp();
 
-  const { signupForm} = useContext(AuthContext) as AuthContextProps;
+  const { signupForm } = useContext(AuthContext) as AuthContextProps;
+  const { ForgotPasswordOtp } = useContext(OtpContext) as OtpContextType;
 
   const otpResentHandle = () => {
     const otpAndSignup: OtpAndSignupType = {
@@ -62,8 +59,7 @@ const OtpPage: React.FC = () => {
       signup: signupForm?.email ?? null,
     };
     OTPReset(otpAndSignup);
-    setTimeLeft(60)
-   
+    setTimeLeft(60);
   };
 
   const otpSubmitHandle = () => {
@@ -72,18 +68,17 @@ const OtpPage: React.FC = () => {
       otp: otpString,
       signup: signupForm?.email ?? null,
     };
+    ForgotPasswordOtp(otpAndSignup);
     OTPSubmit(otpAndSignup);
   };
+
   useEffect(() => {
-    // Exit early when we reach 0
     if (timeLeft === 0) return;
 
-    // Save the interval ID to clear it later
     const intervalId = setInterval(() => {
       setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
     }, 1000);
 
-    // Clear the interval when the component unmounts or timeLeft changes
     return () => clearInterval(intervalId);
   }, [timeLeft]);
 
@@ -96,7 +91,7 @@ const OtpPage: React.FC = () => {
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium
             veritatis sed, labore earum esse nulla?
           </p>
-          <div className="mt-4 text-center text-gray-500">00.{timeLeft}</div>
+          <div className="mt-4 text-center text-gray-500">00:{timeLeft}</div>
         </div>
         <div className="mt-10 flex gap-6">
           {[...Array(6)].map((_, index) => (
@@ -113,8 +108,11 @@ const OtpPage: React.FC = () => {
           ))}
         </div>
         <div className="mt-16 flex justify-between w-full">
-          {timeLeft === 0 &&(
-            <button onClick={otpResentHandle} className="bg-slate-500 px-8 py-2 rounded-full text-white text-sm hover:bg-slate-900 ml-auto">
+          {timeLeft === 0 && (
+            <button
+              onClick={otpResentHandle}
+              className="bg-slate-500 px-8 py-2 rounded-full text-white text-sm hover:bg-slate-900 ml-auto"
+            >
               Resend
             </button>
           )}

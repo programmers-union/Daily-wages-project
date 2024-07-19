@@ -1,8 +1,13 @@
-import { createContext, useState } from 'react';
-import { AuthContextProps, ChildrenNode, EmailData, EmailPasswordData, FormData } from '../../types/authTypes/AuthTypes';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
+import React, { createContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import {
+  AuthContextProps,
+  ChildrenNode,
+  EmailData,
+  EmailPasswordData,
+  FormData,
+} from "../../types/authTypes/AuthTypes";
 
 const AuthContext = createContext<AuthContextProps | null>(null);
 
@@ -13,39 +18,79 @@ export const AuthProvider = ({ children }: ChildrenNode) => {
 
   const SignUp = async (formData: FormData) => {
     setSignupForm(formData);
-    try {
-      const response = await axios.post('http://localhost:5000/api/client/signup', formData);
-      console.log('Sign-up process started', response.data);
-    } catch (error) {
-      console.error('Sign-up process failed:', error);
-      throw error.response?.data?.message || 'Sign-up process failed';
+    if (
+      formData.firstName.trim() &&
+      formData.lastName.trim() &&
+      formData.email.trim() &&
+      formData.password.trim() &&
+      formData.phoneNumber.trim() !== ""
+    ) {
+      navigate("/otp");
+      try {
+        const response = await axios.post(
+          "http://localhost:5000/api/client/signup",
+          formData
+        );
+        console.log("Sign-up process started", response.data);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          console.error("sign up failed:", error.response?.data?.message);
+          throw error.response?.data?.message || "sign up failed";
+        } else {
+          console.error("An unexpected error occurred:", error);
+          throw "An unexpected error occurred";
+        }
+      }
+    } else {
+      alert("Please fill all the fields");
     }
-    navigate('/otp');
   };
 
   const EmailLogin = async (loginData: EmailData) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/client/loginMailCheck', loginData);
+      const response = await axios.get(
+        "http://localhost:5000/api/client/loginMailCheck",{
+        params: { loginData: JSON.stringify(loginData) },
+      });
       setLoginEmailTrue(response.data);
     } catch (error) {
-      console.error('Email login process failed:', error);
-      throw error.response?.data?.message || 'Email login process failed';
+      if (axios.isAxiosError(error)) {
+        console.error("email not valid:", error.response?.data?.message);
+        throw error.response?.data?.message || "email not valid";
+      } else {
+        console.error("An unexpected error occurred:", error);
+        throw "An unexpected error occurred";
+      }
     }
   };
 
   const Login = async (loginData: EmailPasswordData) => {
-    try {
-      const response = await axios.post('http://localhost:5000/api/client/login', loginData);
-      console.log('Login process started', response.data);
-      navigate('/home');
-    } catch (error) {
-      console.error('Login process failed:', error.Response?.data?.massage);
-      throw error.response?.data?.message || 'Login process failed';
+    if (loginData.email.trim() && loginData.password.trim() !== "") {
+      try {
+        const response = await axios.post(
+          "http://localhost:5000/api/client/login",
+          loginData
+        );
+        console.log("Login process started", response.data);
+        navigate("/home");
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          console.error("login failed:", error.response?.data?.message);
+          throw error.response?.data?.message || "login failed";
+        } else {
+          console.error("An unexpected error occurred:", error);
+          throw "An unexpected error occurred";
+        }
+      }
+    } else {
+      alert("Please fill all the fields");
     }
   };
 
   return (
-    <AuthContext.Provider value={{ SignUp, EmailLogin, Login, signupForm, loginEmailTrue }}>
+    <AuthContext.Provider
+      value={{ SignUp, EmailLogin, Login, signupForm, loginEmailTrue }}
+    >
       {children}
     </AuthContext.Provider>
   );
