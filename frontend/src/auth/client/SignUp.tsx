@@ -132,7 +132,7 @@ const SignUp: React.FC = () => {
                 />
                 Continue with Apple
               </button>
-              <button className="bg-blue-500 text-white w-full py-2 text-xs px-4 rounded flex items-center">
+              <button onClick={()=> window.location.href = 'http://localhost:5000/api/auth/google'}  className="bg-blue-500 text-white w-full py-2 text-xs px-4 rounded flex items-center">
                 <img
                   src="https://cdn-icons-png.flaticon.com/128/281/281764.png"
                   alt="Google Logo"

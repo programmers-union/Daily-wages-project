@@ -46,10 +46,7 @@ const Login: React.FC = () => {
       setIsActive(true);
     }
   }, [loginEmailTrue]);
-  const handleLogin = () => {
-    console.log('google login ')
-    window.location.href = 'http://localhost:5000/api/auth/google';
-  };
+
   return (
     <div className="">
       <div className="flex items-center justify-center min-h-screen">
@@ -128,7 +125,7 @@ const Login: React.FC = () => {
               Continue with Apple
             </button>
             <button 
-            onClick={handleLogin} className="bg-black w-full justify-center text-white text-[12px] helvetic py-2 px-4 rounded flex items-center">
+            onClick={()=> window.location.href = 'http://localhost:5000/api/auth/google'} className="bg-black w-full justify-center text-white text-[12px] helvetic py-2 px-4 rounded flex items-center">
               <img
                 src="https://cdn-icons-png.flaticon.com/128/281/281764.png"
                 alt="Google Logo"
