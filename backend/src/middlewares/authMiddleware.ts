@@ -1,17 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import { verifyToken } from '../helpers/generateToken';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies.jwt;
-  if (!token) return res.status(401).send('Access denied. No token provided.');
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).send('Access denied. No token provided.');
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-    req.user = decoded;
-    next();
-  } catch (ex) {
-    res.status(400).send('Invalid token.');
-  }
+    const token = authHeader.split(' ')[1];
+    const secret = process.env.ACCESS_TOKEN_SECRET;
+    if (!secret) {
+        return res.status(500).send('Server configuration error. No secret defined.');
+    }
+
+    const payload = verifyToken(token, secret);
+    if (payload) {
+        req.user = payload; // Attach payload to request if needed
+        next();
+    } else {
+        res.status(400).send('Invalid or expired access token.');
+    }
 };
 
 export default authMiddleware;

@@ -8,7 +8,7 @@ import { OtpContext } from "../../context/modules/OtpContext";
 const OtpPage: React.FC = () => {
   const [otpData, setOtpData] = useState<string[]>(Array(6).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const [timeLeft, setTimeLeft] = useState<number>(60);
+  const [timeLeft, setTimeLeft] = useState<number>(20);
 
   useEffect(() => {
     if (inputRefs.current[0]) {
@@ -50,13 +50,13 @@ const OtpPage: React.FC = () => {
 
   const { OTPSubmit, OTPReset } = UseOtp();
 
-  const { signupForm } = useContext(AuthContext) as AuthContextProps;
+  const { singleEmail } = useContext(AuthContext) as AuthContextProps;
   const { ForgotPasswordOtp } = useContext(OtpContext) as OtpContextType;
 
   const otpResentHandle = () => {
     const otpAndSignup: OtpAndSignupType = {
       otp: "",
-      signup: signupForm?.email ?? null,
+      signup: singleEmail,
     };
     OTPReset(otpAndSignup);
     setTimeLeft(60);
@@ -66,7 +66,7 @@ const OtpPage: React.FC = () => {
     const otpString = otpData.join("");
     const otpAndSignup: OtpAndSignupType = {
       otp: otpString,
-      signup: signupForm?.email ?? null,
+      signup: singleEmail,
     };
     ForgotPasswordOtp(otpAndSignup);
     OTPSubmit(otpAndSignup);

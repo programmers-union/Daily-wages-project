@@ -1,19 +1,30 @@
 import { MuiTelInput } from 'mui-tel-input';
 import React, { ChangeEvent, useContext, useState } from 'react';
 import { OtpContext } from '../../../context/modules/OtpContext';
-import { ForgotPasswordType } from '../../../types/Otp';
+import { ForgotPasswordType, OtpContextType } from '../../../types/Otp';
+import AuthContext from '../../../context/modules/AuthContext';
+import { AuthContextProps } from '../../../types/authTypes/AuthTypes';
+import AuthError from '../../../components/error/AuthError';
 
 const CheckEmailAndPhone = () => {
   const [method, setMethod] = useState<string>('1');
   const [value, setValue] = useState('');
+  const [errorHandle , setErrorHandle ] = useState<string>('')
+
 
   const { ForgotPassword } = useContext(OtpContext) as ForgotPasswordType;
+  const {  singleEmail  } = useContext(AuthContext) as AuthContextProps;
+  const { setForgotCheckBox } = useContext(OtpContext) as OtpContextType;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-        console.log(value, 'value');
-        ForgotPassword(value);
+        if(singleEmail === value){
+          ForgotPassword(value);
+          setForgotCheckBox(method)
+        }else{
+          setErrorHandle('emial not valid')
+        }
      } catch (error) {
        console.log(error, 'error');
      }
@@ -21,6 +32,7 @@ const CheckEmailAndPhone = () => {
 
   const forgotHandle = (e: ChangeEvent<HTMLInputElement>) => {
     setMethod(e.target.value);
+    
   };
 
 
@@ -76,6 +88,7 @@ const CheckEmailAndPhone = () => {
             </button>
           </div>
         </form>
+        <AuthError item={errorHandle} />
       </div>
     </div>
   );

@@ -2,14 +2,18 @@
 export interface SignupClientRequestBody {
     firstName: string;
     lastName: string;
-    email: string;
+    email: string ;
     password: string;
     phoneNumber: string;
   }
 
 
-  export interface ResendOtpRequestBody {
+export interface ResendOtpRequestBody {
+  otp: {
+    otp: string;
     signup: Pick<SignupClientRequestBody, 'email'>;
+  };
+  forgotCheckBox:string;
 }
 
 export interface VerifyOtpRequestBody {

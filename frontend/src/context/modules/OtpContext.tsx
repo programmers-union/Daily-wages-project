@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode } from 'react';
+import React, { createContext, ReactNode, useState } from 'react';
 import axios from 'axios';
 import { OtpAndSignupType, OtpContextType } from '../../types/Otp';
 import { useNavigate } from 'react-router-dom';
@@ -6,21 +6,29 @@ import { useNavigate } from 'react-router-dom';
 const OtpContext = createContext<OtpContextType | undefined>(undefined);
 
 const OtpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [forgotCheckBox , setForgotCheckBox] =useState<string>('')
   const navigate = useNavigate();
 
   const OTPSubmit = async (otp: OtpAndSignupType) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/client/verifyOtp', { otp });
-      console.log('OTP submit started', response.data);
-      // Navigate or update state as needed
+      console.log(otp,'&&&')
+      const response = await axios.patch('http://localhost:5000/api/client/verifyOtp', { otp });
+      const isCheckedToHome =  response.data
+      const storeInLocalStorage = isCheckedToHome.accessToken 
+      console.log(storeInLocalStorage,'((')
+      localStorage.setItem('accessToken',storeInLocalStorage)
+      if(isCheckedToHome.otpVerified === true) {
+        navigate('/home')
+      }
     } catch (error) {
       console.error('OTP submit error', error);
     }
   };
 
   const OTPReset = async (otp: OtpAndSignupType) => {
+    console.log(otp,'otp otp otp')
     try {
-      const response = await axios.post('http://localhost:5000/api/client/resendOtp', { otp });
+      const response = await axios.post('http://localhost:5000/api/client/resendOtp', { otp,forgotCheckBox });
       console.log('Reset OTP started', response.data);
       // Update state as needed
     } catch (error) {
@@ -64,7 +72,7 @@ const OtpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // };
 
   return (
-    <OtpContext.Provider value={{ OTPSubmit, OTPReset, ForgotPassword, ForgotPasswordOtp  }}>
+    <OtpContext.Provider value={{ OTPSubmit, OTPReset, ForgotPassword, ForgotPasswordOtp , setForgotCheckBox }}>
       {children}
     </OtpContext.Provider>
   );

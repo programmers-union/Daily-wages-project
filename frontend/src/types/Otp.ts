@@ -6,6 +6,7 @@ export interface OtpContextType {
   ForgotPassword: (forgotPassword: string) => Promise<void>;
   ForgotPasswordOtp: (forgotPasswordOtp: OtpAndSignupType) => Promise<void>;
   // ForgotOTPSubmit: (otp: OtpAndSignupType) => Promise<void>;
+  setForgotCheckBox: (forgotCheckBox: string) => void;
 }
 
 export interface ChildrenNode {

@@ -14,6 +14,8 @@ const AuthContext = createContext<AuthContextProps | null>(null);
 export const AuthProvider = ({ children }: ChildrenNode) => {
   const [signupForm, setSignupForm] = useState<FormData | null>(null);
   const [loginEmailTrue, setLoginEmailTrue] = useState<string | undefined>();
+  const [singleEmail , setSingleEmail] = useState<string>('');
+
   const navigate = useNavigate();
 
   const SignUp = async (formData: FormData) => {
@@ -52,6 +54,7 @@ export const AuthProvider = ({ children }: ChildrenNode) => {
         "http://localhost:5000/api/client/loginMailCheck",{
         params: { loginData: JSON.stringify(loginData) },
       });
+      setSingleEmail(loginData.email); 
       setLoginEmailTrue(response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -89,7 +92,7 @@ export const AuthProvider = ({ children }: ChildrenNode) => {
 
   return (
     <AuthContext.Provider
-      value={{ SignUp, EmailLogin, Login, signupForm, loginEmailTrue }}
+      value={{ SignUp, EmailLogin, Login, signupForm, loginEmailTrue , singleEmail }}
     >
       {children}
     </AuthContext.Provider>

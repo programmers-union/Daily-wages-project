@@ -3,22 +3,31 @@ import { validationResult } from "express-validator";
 import Client from "../models/Client";
 import { generateOtp, sendOtpToUser } from "../helpers/otpHelper";
 import { sendOtpViaEmail } from "../services/mailService";
-import { generateToken } from "../helpers/generateToken";
+import {
+  generateRefreshToken,
+  generateAccessToken,
+  verifyToken,
+} from "../helpers/generateToken";
 import bcrypt from "bcryptjs";
-import { SignupClientRequestBody,ResendOtpRequestBody,VerifyOtpRequestBody,EmailRequestBody,LoginRequestBody } from "client/requests";
+import {
+  SignupClientRequestBody,
+  ResendOtpRequestBody,
+  VerifyOtpRequestBody,
+  EmailRequestBody,
+  LoginRequestBody,
+} from "client/requests";
 import { ErrorResponse, SuccessResponse } from "client/response";
 
-
-
 export const signupClient = async (
-  req: Request<{},{},SignupClientRequestBody>,
+  req: Request<{}, {}, SignupClientRequestBody>,
   res: Response<SuccessResponse | ErrorResponse>,
   next: NextFunction
 ) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ msg: "Validation failed", errors: errors.array() });
-
+    return res
+      .status(400)
+      .json({ msg: "Validation failed", errors: errors.array() });
   }
   // console.log(req.body);
   const { firstName, lastName, email, password, phoneNumber } = req.body;
@@ -27,7 +36,9 @@ export const signupClient = async (
     let client = await Client.findOne({ email });
 
     if (client) {
-      return res.status(409).json({ msg: "Client with this email already exist" });
+      return res
+        .status(409)
+        .json({ msg: "Client with this email already exist" });
     }
 
     const otp = generateOtp();
@@ -56,20 +67,20 @@ export const signupClient = async (
   }
 };
 
-
 export const verifyOtp = async (
-  req: Request<{}, {}, VerifyOtpRequestBody>,
+  req: Request<{}, {}, ResendOtpRequestBody>,
   res: Response<SuccessResponse | ErrorResponse>,
   next: NextFunction
 ) => {
-  console.log("reached here")
-  const { otp } = req.body;
-  console.log("otp:",otp);
+  const { otp } = req.body.otp;
+
   try {
     const client = await Client.findOne({ otp });
-    console.log("client:",client);
+    console.log("client:", client);
     if (!client) {
-      return res.status(404).json({ msg: "Client not found with the provided OTP" });
+      return res
+        .status(404)
+        .json({ msg: "Client not found with the provided OTP" });
     }
     if (client.otp !== otp) {
       return res.status(400).json({ msg: "Invalid OTP" });
@@ -80,15 +91,27 @@ export const verifyOtp = async (
     }
     client.otp = undefined;
     client.isVerified = true;
+
+    const { accessToken, expiresIn } = generateAccessToken(String(client._id));
+    const refreshToken = generateRefreshToken(String(client._id));
+    client.refreshToken = refreshToken;
     await client.save();
 
-    const token = generateToken(String(client._id));
-
-    res.cookie("jwt", token, { httpOnly: true, maxAge: 3600000 });
+    res.cookie("jwtRefreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+    });
 
     res
       .status(200)
-      .json({ msg: "OTP verified successfully", otpVerified: true });
+      .json({
+        msg: "OTP verified successfully",
+        otpVerified: true,
+        accessToken: accessToken,
+        expiresIn: expiresIn,
+      });
   } catch (error) {
     next(error);
   }
@@ -99,7 +122,10 @@ export const resendOtp = async (
   res: Response<SuccessResponse | ErrorResponse>,
   next: NextFunction
 ) => {
-  const { email } = req.body.signup;
+  console.log(req.body, "bodyyeeeeeeeeee");
+  const email = req.body.otp.signup;
+  const inputCheckBox = req.body.forgotCheckBox;
+  console.log("email", email);
 
   try {
     const client = await Client.findOne({ email });
@@ -108,17 +134,21 @@ export const resendOtp = async (
       return res.status(404).json({ msg: "Client not found" });
     }
     const otp = generateOtp();
-    const otpExpiry=new Date(Date.now() + 15 * 60 * 1000);
+    const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
     client.otp = otp;
-    client.otpExpiry=otpExpiry;
+    client.otpExpiry = otpExpiry;
     await client.save();
-    await sendOtpToUser(client.phoneNumber, otp);
+    if (inputCheckBox === "1") {
+      await sendOtpViaEmail(client.email, otp);
+    } else {
+      await sendOtpToUser(client.phoneNumber, otp);
+    }
+
     res.status(200).json({ msg: "OTP resent successfully" });
   } catch (error) {
     next(error);
   }
 };
-
 
 export const loginMailCheck = async (
   req: Request<{}, {}, EmailRequestBody>,
@@ -136,29 +166,26 @@ export const loginMailCheck = async (
 
   const { email } = parsedLoginData;
   try {
-    const client = await Client.findOne({email});
+    const client = await Client.findOne({ email });
     if (!client) {
       return res.status(401).json({ msg: "please do signup", signup: false });
     }
-    return res
-      .status(200)
-      .json({
-        msg: "have account with this email please enter password",
-        loginMail: true,
-      });
+    return res.status(200).json({
+      msg: "have account with this email please enter password",
+      loginMail: true,
+    });
   } catch (error) {
     next(error);
   }
 };
 
-
 export const loginClient = async (
-  req: Request<{},{},LoginRequestBody>,
+  req: Request<{}, {}, LoginRequestBody>,
   res: Response<SuccessResponse | ErrorResponse>,
   next: NextFunction
 ) => {
   const { email, password } = req.body;
- 
+
   try {
     const client = await Client.findOne({ email });
     if (!client) {
@@ -172,7 +199,7 @@ export const loginClient = async (
     if (!isMatch) {
       return res.status(400).json({ msg: "invalid credentials" });
     }
-    const token = generateToken(String(client._id));
+    const token = generateAccessToken(String(client._id));
     res.cookie("jwt", token, { httpOnly: true, maxAge: 3600000 });
 
     return res
@@ -183,13 +210,13 @@ export const loginClient = async (
   }
 };
 
-
 export const forgotPassword = async (
   req: Request<{}, {}, {}, { forgotPassword: string }>,
   res: Response<{ msg: string; signUp?: boolean }>,
   next: NextFunction
 ) => {
   const { forgotPassword } = req.query;
+  console.log(forgotPassword, 'MMMMM');
 
   try {
     if (!forgotPassword) {
@@ -197,68 +224,112 @@ export const forgotPassword = async (
     }
 
     const identifier = forgotPassword as string;
-    const isEmail = identifier.includes('@');
+    const isEmail = identifier.includes("@");
     let client;
 
     if (isEmail) {
-     const client = await Client.findOne({ email: identifier });
-      if (!client) {
-        return res.status(401).json({ msg: "Please sign up", signUp: false });
-      }
+      client = await Client.findOne({ email: identifier });
     } else {
       client = await Client.findOne({ phoneNumber: identifier });
-      if (!client) {
-        return res.status(401).json({ msg: "Please sign up", signUp: false });
-      }
     }
 
-    if (client) {
-      const otp = generateOtp();
-      const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
-      client.otp = otp;
-      client.otpExpiry = otpExpiry;
-      await client.save();
+   
 
-      if (isEmail) {
-        await sendOtpViaEmail(identifier, otp);
-      } else {
-        await sendOtpToUser(identifier, otp);
-      }
-
-      return res.status(200).json({ msg: "OTP sent successfully" });
+    if (!client) {
+      return res.status(401).json({ msg: "Please sign up", signUp: false });
     }
 
+
+
+    const otp = generateOtp();
+    const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
+    client.otp = otp;
+    client.otpExpiry = otpExpiry;
+    await client.save();
+
+
+
+    if (isEmail) {
+      await sendOtpViaEmail(identifier, otp);
+    } else {
+      await sendOtpToUser(identifier, otp);
+    }
+
+    return res.status(200).json({ msg: "OTP sent successfully" });
   } catch (error) {
     next(error);
   }
 };
 
-
-export const changePassword=async(
-  req:Request<{},{},{newPassword:string,email:string}>,
-  res:Response<{msg:string,changed?:boolean}>,
-  next:NextFunction
-)=>{
-  const {newPassword,email}=req.body;
-  
+export const changePassword = async (
+  req: Request<{}, {}, { newPassword: string; email: string }>,
+  res: Response<{ msg: string; changed?: boolean }>,
+  next: NextFunction
+) => {
+  const { newPassword, email } = req.body;
 
   try {
-    const client=await Client.findOne({email})
-    if(!client){
-      return res.status(404).json({msg:"Client not found"});
+    const client = await Client.findOne({ email });
+    if (!client) {
+      return res.status(404).json({ msg: "Client not found" });
     }
-    const salt=await bcrypt.genSalt(10);
-    const hashedPassword=await bcrypt.hash(newPassword,salt);
-    client.password=hashedPassword;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    client.password = hashedPassword;
     await client.save();
-    res.status(200).json({msg:"passsword changed successfully",changed:true});
+    res
+      .status(200)
+      .json({ msg: "passsword changed successfully", changed: true });
   } catch (error) {
     next(error);
   }
-}
+};
 
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.log("here");
+  const refreshToken = req.cookies.jwtRefreshToken;
+  console.log("refreshToken:", refreshToken);
 
+  if (!refreshToken) {
+    return res.status(401).json({ message: "Refresh token required" });
+  }
 
+  const secret = process.env.REFRESH_TOKEN_SECRET;
+  console.log("REFRESH_TOKEN_SECRET:", secret);
 
+  if (!secret) {
+    return res
+      .status(500)
+      .json({ message: "Server configuration error. No secret defined." });
+  }
 
+  const payload = verifyToken(refreshToken, secret);
+  console.log("payload:", payload);
 
+  if (!payload || typeof payload !== "object" || !("userId" in payload)) {
+    return res.status(403).json({ message: "Invalid refresh token" });
+  }
+
+  try {
+    const client = await Client.findById(payload.userId);
+    console.log("client:", client);
+
+    if (!client || client.refreshToken !== refreshToken) {
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+
+    const newAccessToken = generateAccessToken(client._id);
+    return res.json({ accessToken: newAccessToken });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkToken = (req: Request, res: Response, next: NextFunction) => {
+  console.log(req.body);
+  res.json({ msg: "hey i am back" });
+};

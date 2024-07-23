@@ -7,7 +7,7 @@ import { generateOtp, sendOtpToUser } from "../helpers/otpHelper";
 import bcrypt from "bcryptjs";
 import { ResendOtpEmployeeRequestBody, SignupEmployeeRequestBody,VerifyOtpEmployeeRequestBody } from "../types/employee/request";
 import { ErrorResponseEmployee, SuccessResponseEmployee } from "employee/response";
-import { generateToken } from "../helpers/generateToken";
+import { generateAccessToken } from "../helpers/generateToken";
 import { EmailRequestBody, LoginRequestBody } from "client/requests";
 import { SuccessResponse } from "client/response";
 
@@ -133,7 +133,7 @@ export const verifyOtp= async(
     employee.otp=undefined;
     employee.isVerified=true;
     await employee.save();
-    const token=generateToken(String(employee._id));
+    const token=generateAccessToken(String(employee._id));
     res.cookie("jwt",token,{httpOnly:true,maxAge:3600000});
     res.status(200).json({msg:"OTP verified successfully",otpVerified:true});
   } catch (error) {
@@ -147,7 +147,8 @@ export const resendOtp=async(
   res:Response<SuccessResponseEmployee | ErrorResponseEmployee>,
   next:NextFunction
 )=>{
-  const {email}=req.body.signup;
+  const email = req.body.otp.signup;
+
 
   try {
     const employee=await Employee.findOne({email});
@@ -210,7 +211,7 @@ export const loginEmployee=async(
     if(!isMatch){
       return res.status(400).json({msg:"invalid credentials"});
     }
-    const token=generateToken(String(employee._id));
+    const token=generateAccessToken(String(employee._id));
     res.cookie("jwt",token,{httpOnly:true,maxAge:3600000});
     return res.status(200).json({msg:"Login Successfull",loginSuccess:true});
   } catch (error) {

@@ -17,6 +17,7 @@ export interface AuthContextProps {
   Login: (loginData: EmailPasswordData) => Promise<void>;
   signupForm: FormData | null ;
   loginEmailTrue: string | boolean | undefined ;
+  singleEmail:string
 }
 
 export interface ChildrenNode {

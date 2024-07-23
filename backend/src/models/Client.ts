@@ -8,7 +8,8 @@ export interface IClient extends Document {
     phoneNumber: string;
     otp?:string;
     otpExpiry?:Date;
-    isVerified:Boolean
+    isVerified:Boolean;
+    refreshToken:string;
 }
 
 const ClientSchema: Schema = new Schema({
@@ -19,7 +20,8 @@ const ClientSchema: Schema = new Schema({
     phoneNumber: { type: String, required: true },
     otp:{type:String},
     otpExpiry:{type:Date},
-    isVerified:{type:Boolean}
+    isVerified:{type:Boolean},
+    refreshToken:String
 });
 
 const Client = mongoose.model<IClient>('Client', ClientSchema);

@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import {validateClientSignup} from '../middlewares/validationMiddleware';
-import { signupClient,resendOtp,verifyOtp,loginClient,loginMailCheck,forgotPassword,changePassword } from '../controllers/clientController';
+import authMiddleware from '../middlewares/authMiddleware';
+import { signupClient,resendOtp,verifyOtp,loginClient,loginMailCheck,forgotPassword,changePassword, refreshToken,checkToken } from '../controllers/clientController';
 const router=Router();
 
 
@@ -11,6 +12,7 @@ router.get('/loginMailCheck',loginMailCheck);
 router.post('/login',loginClient);
 router.get('/forgot-password',forgotPassword);
 router.patch('/changePassword',changePassword);
-
+router.post('/refreshToken',refreshToken);
+router.post('/checkToken',authMiddleware,checkToken);
 
 export default router;

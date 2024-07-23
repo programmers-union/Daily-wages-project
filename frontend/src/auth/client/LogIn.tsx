@@ -14,7 +14,6 @@ const Login: React.FC = () => {
   });
 
   const { EmailLogin, Login: contextLogin, loginEmailTrue } = useContext(AuthContext) as AuthContextProps;
-
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLogFormData((prev) => ({ ...prev, [name]: value }));

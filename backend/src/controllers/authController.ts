@@ -1,27 +1,31 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import Client from '../models/Client';
-import { generateToken } from "../helpers/generateToken";
-
+import { generateAccessToken } from "../helpers/generateToken";
 
 export const googleAuthCallback = (req: Request, res: Response) => {
-  if (!req.user || typeof req.user !== 'string') {
+  if (!req.user || typeof req.user !== 'object') {
     return res.status(400).send('User is not authenticated');
   }
-  
-  const token = generateToken(req.user);
+
+  const token = generateAccessToken((req.user as any)._id.toString());
   res.cookie("jwt", token, { httpOnly: true, maxAge: 3600000 });
-  res.redirect(`${process.env.CLIENT_URL}/auth?token=${token}`);
+  res.redirect(`${process.env.API_URL}`);
+  
 };
 
 export const getCurrentUser = async (req: Request, res: Response) => {
-  if (!req.user || typeof req.user !== 'string') {
+  if (!req.user || typeof req.user !== 'object') {
     return res.status(400).send('User is not authenticated');
   }
 
-  const client = await Client.findById(req.user);
+  const client = await Client.findById((req.user as any)._id);
   if (!client) {
     return res.status(404).send('User not found');
   }
 
   res.send(client);
 };
+
+export const facebookAuth = (req: Request, res: Response) => {
+  
+}
