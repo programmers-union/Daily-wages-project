@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import MainCategory from '../category/MainCategory';
 import AddNewCategory from '../category/AddNewCategory';
+import axios from 'axios';
+import { AdminFormListData } from '../../../types/AdminGategoryType';
+import AdminFormContext from '../../../context/modules/AdminFormContext';
 // import { FormProgressProps } from '../../../types/AdminGategoryType';
 
 const DashboardPage: React.FC = () => {
     const [activeAddCategoryPopup, setActiveAddCategoryPopup] = useState<boolean>(false);
-    
+    // const subCategories = [
+    //     'Cleaning', 'Laundry and Clothing Care', 'Organization', 'Maintenance and Repair',
+    //     'Outdoor Tasks', 'Pet Care', 'Plant and Garden Care', 'Vehicle Care', 'Food and Kitchen Services',
+    //     'Childcare and Supervision', 'Home and Property Services', 'Errands and Personal Assistance',
+    //     'Event and Hospitality Services', 'Outdoor and Recreational Services', 'Odd Jobs and Miscellaneous Tasks',
+    //     'Administrative and Data Services', 'Specialized Cleaning', 'Agricultural Tasks'
+    //   ];
     const sideNav = [
         'Dashboard',
         'Reports',
@@ -40,7 +49,38 @@ const DashboardPage: React.FC = () => {
         'mdi-chair-rolling',
         'mdi-shield-sun'
     ];
-      
+    const {setGetSubCategoryAndItems} = useContext(
+        AdminFormContext
+      ) as AdminFormListData;
+    useEffect(() => {
+        const GetMainCategory = async () => {
+          try {
+            const response = await axios.get(
+              "http://localhost:5000/api/admin/get-sub-categories"
+            );
+            const categories = response.data;
+            console.log(response.data);
+    
+            // const key = "66910ef763e78be1c1d7e518"; 
+            // const items = categories[0][key].map((item: { name: string }) => item.name);
+            setGetSubCategoryAndItems(categories);
+    
+            console.log("Categories fetched", response.data);
+          } catch (error) {
+            if (axios.isAxiosError(error)) {
+              console.error(
+                "Error fetching categories:",
+                error.response?.data?.message
+              );
+              throw error.response?.data?.message || "Error fetching categories";
+            } else {
+              console.error("An unexpected error occurred:", error);
+              throw "An unexpected error occurred";
+            }
+          }
+        };
+        GetMainCategory();
+      }, []);
     return (
         <>
         <div className='min-w-[1024px] flex content-center sm:max-w-screen-xl mx-auto'>

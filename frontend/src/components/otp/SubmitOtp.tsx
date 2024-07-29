@@ -53,13 +53,15 @@ const OtpPage: React.FC = () => {
   const { singleEmail } = useContext(AuthContext) as AuthContextProps;
   const { ForgotPasswordOtp } = useContext(OtpContext) as OtpContextType;
 
+console.log(singleEmail,'single email')
+
   const otpResentHandle = () => {
     const otpAndSignup: OtpAndSignupType = {
       otp: "",
       signup: singleEmail,
     };
     OTPReset(otpAndSignup);
-    setTimeLeft(60);
+    setTimeLeft(20);
   };
 
   const otpSubmitHandle = () => {

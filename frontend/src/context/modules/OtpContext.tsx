@@ -42,7 +42,7 @@ const OtpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
     try {
       const response = await axios.get('http://localhost:5000/api/client/forgot-password', {
-        params: { forgotPassword },
+        params: { forgotPassword ,forgotCheckBox },
       });
       console.log('Forgot password request started', response.data);
     } catch (error) {

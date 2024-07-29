@@ -22,8 +22,11 @@ const CheckEmailAndPhone = () => {
         if(singleEmail === value){
           ForgotPassword(value);
           setForgotCheckBox(method)
+        }else if(value.includes('+') === true ){
+          ForgotPassword(value);
+          setForgotCheckBox(method)
         }else{
-          setErrorHandle('emial not valid')
+          setErrorHandle('not valid')
         }
      } catch (error) {
        console.log(error, 'error');

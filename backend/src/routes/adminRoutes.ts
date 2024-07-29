@@ -7,12 +7,14 @@ const upload=multer({storage:storage});
 
 adminRouter.post('/signup',signupAdmin);
 adminRouter.get('/login',loginAdmin);
-adminRouter.post('/addCategory',upload.single('photo'),addCategoryData);
-adminRouter.get('/getCategories',getCategories);
-adminRouter.post('/addSubCategory',addSubCategory);
-adminRouter.get('/getSubCategories',getSubCategories);
-adminRouter.get('/getClients',getClientsData);
-adminRouter.get('/getEmployees',getEmployeesData);
+// adminRouter.post('/add-category',upload.single('photo'),addCategoryData);
+adminRouter.get('/get-main-categories',getCategories);
+adminRouter.post('/add-sub-category',upload.single('photo'),addSubCategory);
+adminRouter.get('/get-sub-categories',getSubCategories);
+// adminRouter.get('/add-sub-category-items',addSubCategoryItems);
+adminRouter.get('/get-clients',getClientsData);
+adminRouter.get('/get-employees',getEmployeesData);
+
 
 
 

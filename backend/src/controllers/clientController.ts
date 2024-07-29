@@ -59,7 +59,7 @@ export const signupClient = async (
 
     await newClient.save();
 
-    // await sendOtpToUser(phoneNumber, otp);
+    await sendOtpToUser(phoneNumber, otp);
 
     res.status(201).json({ msg: "OTP send for verification" });
   } catch (err: any) {
@@ -122,28 +122,21 @@ export const resendOtp = async (
   res: Response<SuccessResponse | ErrorResponse>,
   next: NextFunction
 ) => {
-  console.log(req.body, "bodyyeeeeeeeeee");
-  const email = req.body.otp.signup;
-  const inputCheckBox = req.body.forgotCheckBox;
-  console.log("email", email);
-
+  console.log('one')
+  const  email  = req.body.otp.signup;
+console.log(email,'emil')
   try {
     const client = await Client.findOne({ email });
-
+console.log(client ,'clie')
     if (!client) {
       return res.status(404).json({ msg: "Client not found" });
     }
     const otp = generateOtp();
-    const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
+    const otpExpiry=new Date(Date.now() + 15 * 60 * 1000);
     client.otp = otp;
-    client.otpExpiry = otpExpiry;
+    client.otpExpiry=otpExpiry;
     await client.save();
-    if (inputCheckBox === "1") {
-      await sendOtpViaEmail(client.email, otp);
-    } else {
-      await sendOtpToUser(client.phoneNumber, otp);
-    }
-
+    await sendOtpToUser(client.phoneNumber as string, otp);
     res.status(200).json({ msg: "OTP resent successfully" });
   } catch (error) {
     next(error);
@@ -193,9 +186,7 @@ export const loginClient = async (
         .status(401)
         .json({ msg: "there is no account with this email need to signup" });
     }
-    // console.log(client.password);
     const isMatch = await bcrypt.compare(password, client.password);
-    // console.log("isMatch:", isMatch);
     if (!isMatch) {
       return res.status(400).json({ msg: "invalid credentials" });
     }
@@ -211,18 +202,18 @@ export const loginClient = async (
 };
 
 export const forgotPassword = async (
-  req: Request<{}, {}, {}, { forgotPassword: string }>,
+  req: Request<{}, {}, {}, { forgotPassword: string; forgotCheckBox: string }>,
   res: Response<{ msg: string; signUp?: boolean }>,
   next: NextFunction
 ) => {
-  const { forgotPassword } = req.query;
-  console.log(forgotPassword, 'MMMMM');
-
+  console.log('first')
+  const { forgotPassword, forgotCheckBox } = req.query;
+console.log(forgotCheckBox,'90')
+console.log(forgotCheckBox,'100')
   try {
     if (!forgotPassword) {
       return res.status(400).json({ msg: "Identifier is required" });
     }
-
     const identifier = forgotPassword as string;
     const isEmail = identifier.includes("@");
     let client;
@@ -233,13 +224,9 @@ export const forgotPassword = async (
       client = await Client.findOne({ phoneNumber: identifier });
     }
 
-   
-
     if (!client) {
-      return res.status(401).json({ msg: "Please sign up", signUp: false });
+      return res.status(401).json({ msg: "Please sign up", signUp: true });
     }
-
-
 
     const otp = generateOtp();
     const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
@@ -247,12 +234,10 @@ export const forgotPassword = async (
     client.otpExpiry = otpExpiry;
     await client.save();
 
-
-
-    if (isEmail) {
-      await sendOtpViaEmail(identifier, otp);
+    if (forgotCheckBox === "1") {
+      await sendOtpViaEmail(client.email, otp);
     } else {
-      await sendOtpToUser(identifier, otp);
+      await sendOtpToUser(client.phoneNumber, otp);
     }
 
     return res.status(200).json({ msg: "OTP sent successfully" });
