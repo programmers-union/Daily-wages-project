@@ -4,6 +4,7 @@ import { AuthContextProps, EmailData, EmailPasswordData } from '../../types/auth
 import AuthError from "../../components/error/AuthError";
 import { Link } from "react-router-dom";
 
+
 const Login: React.FC = () => {
   const [isActive, setIsActive] = useState(false);
   const [error, setError] = useState<string>('');
@@ -117,11 +118,11 @@ const Login: React.FC = () => {
           <div className="flex justify-center items-center mb-4 w-3/4 m-auto">
             <button className="bg-black w-full text-white py-2 text-[12px] helvetic px-4 rounded mr-2 flex justify-center items-center">
               <img
-                src="https://cdn-icons-png.flaticon.com/128/179/179309.png"
+                src="https://cdn-icons-png.flaticon.com/128/15047/15047435.png"
                 alt="Apple Logo"
                 className="w-5 h-5 mr-2"
               />
-              Continue with Apple
+              Continue with Facebook
             </button>
             <button 
             onClick={()=> window.location.href = 'http://localhost:5000/api/auth/google'} className="bg-black w-full justify-center text-white text-[12px] helvetic py-2 px-4 rounded flex items-center">

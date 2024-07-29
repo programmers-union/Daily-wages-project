@@ -1,16 +1,17 @@
 import axios from "axios";
-import React, { createContext } from "react";
+import React, { createContext, useState, FC } from "react";
 import { ChildrenNode } from "../../types/authTypes/AuthTypes";
 import { AdminFormData, AdminFormListData } from "../../types/AdminGategoryType";
 
 const AdminFormContext = createContext<AdminFormListData | null>(null);
 
-export const AdminContext = ({ children }: ChildrenNode) => {
-
+export const AdminContext: FC<ChildrenNode> = ({ children }) => {
+  const [mainCategoryId, setMainCategoryId] = useState<string>('');
+  const [getSubCategoryAndItems, setGetSubCategoryAndItems] = useState<string[]>([]);
+  
   const AdminFormAdding = async (formDataAdmin: AdminFormData) => {
-    console.log(formDataAdmin, 'admin****');
     try {
-      const response = await axios.post('http://localhost:5000/api/admin/add-category', formDataAdmin);
+      const response = await axios.post('http://localhost:5000/api/admin/add-sub-category-items', formDataAdmin);
       console.log('Category added', response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -24,7 +25,7 @@ export const AdminContext = ({ children }: ChildrenNode) => {
   };
 
   return (
-    <AdminFormContext.Provider value={{ AdminFormAdding }}>
+    <AdminFormContext.Provider value={{ AdminFormAdding, setMainCategoryId, mainCategoryId , setGetSubCategoryAndItems ,getSubCategoryAndItems }}>
       {children}
     </AdminFormContext.Provider>
   );

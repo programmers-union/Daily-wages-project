@@ -5,20 +5,8 @@ import SubCategory from "../models/SubCategory"
 import Client from "../models/Client";
 import Employee from "../models/Employee";
 import bcrypt from "bcryptjs";
-// import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import uploadIcon from "../config/cloudinaryConfig";
 
-// const bucketName = 
-// const bucketRegion = 
-// const accessKey = 
-// const secretKey = 
-// const s3 = new S3Client({
-//   credentials: {
-//     accessKeyId: accessKey,
-//     secretAccessKey: secretKey,
-//   },
-
-//   region: bucketRegion,
-// });
 
 
 export const signupAdmin = async (
@@ -85,21 +73,55 @@ export const getCategories=async(
 };
 
 
-export const getSubCategories=async(
-  req:Request,
-  res:Response,
-  next:NextFunction
-)=>{
+export const getSubCategories = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const {category}=req.body
-    const subCategoryData=await SubCategory.find({Category:category});
-    if(!subCategoryData){
-      return res.status(404).json({msg:"no subCategory for this category"});
-    }
-    return res.status(200).json({msg:"sub category data fetched successfully",subCategoryData})
-   
+    const subCategories = await SubCategory.aggregate([
+      {
+        $lookup: {
+          from: 'categories', 
+          localField: 'category',
+          foreignField: '_id',
+          as: 'categoryDetails'
+        }
+      },
+      {
+        $unwind: '$categoryDetails'
+      },
+      {
+        $group: {
+          _id: '$categoryDetails._id',
+          categoryName: { $first: '$categoryDetails.categoryName' },
+          subCategories: {
+            $push: {
+              name: '$name',
+              iconUrl: '$iconUrl'
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          categoryId: '$_id',
+          categoryName: 1,
+          subCategories: 1
+        }
+      }
+    ]);
+
+    
+    const result = subCategories.reduce((acc, item) => {
+      acc[item.categoryId] = item.subCategories;
+      return acc;
+    }, {});
+
+    res.status(200).json([result]);
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
 
@@ -134,16 +156,32 @@ export const addSubCategory=async (
   next:NextFunction
 )=>{
   const {name,category}=req.body;
+  const file=req.file;
   try {
-    const subCategory=await SubCategory.find({name:name});
+    const subCategory=await SubCategory.findOne({name:name});
+    console.log("subCategory:",subCategory);
     if(subCategory){
       return res.json({msg:"already added"})
     };
+
+    let iconUrl = '';
+  
+    if (file) {
+      
+        iconUrl = await uploadIcon(file.buffer);
+        console.log("iconUrl:",iconUrl);
+    }
+
     const newSubCategory=new SubCategory({
       name,
-      category
+      category,
+      iconUrl:iconUrl
     });
+    console.log("newSubCategory:",newSubCategory);
+
     await newSubCategory.save();
+    console.log("three");
+    res.status(201).json({ msg: "Sub-category added successfully" });
   } catch (error) {
     next(error);
   }
@@ -185,42 +223,6 @@ export const getEmployeesData=async(
     next(error);
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

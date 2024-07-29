@@ -84,7 +84,7 @@ const ScheduleSection: React.FC = () => {
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis
           aspernatur est distinctio voluptas doloribus modi!
         </p>
-        <Link to='/worker-calendar'>
+        <Link to='/client-calendar'>
         <button className="px-6 py-1 bg-custom-gradient text-sm border rounded-full mt-6">
           Schedule
         </button>

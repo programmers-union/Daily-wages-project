@@ -14,7 +14,6 @@ export const sendOtp=async(mobileNumber:string,otp:string):Promise<void>=>{
             body:`Your OTP is ${otp}`,
             to:mobileNumber,
             from:process.env.TWILIO_NUMBER
-
         })
 
     } catch (error) {

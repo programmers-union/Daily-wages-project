@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }: ChildrenNode) => {
           "http://localhost:5000/api/client/signup",
           formData
         );
+        setSingleEmail(formData.email)
         console.log("Sign-up process started", response.data);
       } catch (error) {
         if (axios.isAxiosError(error)) {

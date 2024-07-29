@@ -26,6 +26,6 @@ export const getCurrentUser = async (req: Request, res: Response) => {
   res.send(client);
 };
 
-export const facebookAuth = (req: Request, res: Response) => {
-  
+export const facebookAuth = async (req: Request, res: Response) => {
+  console.log('someeeeeeeee')
 }
