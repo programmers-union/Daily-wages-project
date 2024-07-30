@@ -1,34 +1,46 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { AdminFormListData, MainCategoryProps } from "../../../types/AdminGategoryType";
+import {
+  AdminFormListData,
+  MainCategoryTableProps,
+} from "../../../types/AdminGategoryType";
 import AdminFormContext from "../../../context/modules/AdminFormContext";
 
-const TableFilter: React.FC<MainCategoryProps> = ({
-  setActiveAddCategoryPopup,
+const TableFilter: React.FC<MainCategoryTableProps> = ({
+  setActiveAddCategoryPopup, paginate ,currentPage 
 }) => {
   const [filterHandle, setFilterHandle] = useState<boolean>(false);
   const [getSubCategories, setGetSubCategories] = useState<string[]>([]);
-  const [filterClickSubCategory, setFilterClickSubCategory] = useState<string>('All');
+  const [filterClickSubCategory, setFilterClickSubCategory] =
+    useState<string>("All");
   const filterRef = useRef<HTMLDivElement>(null);
 
-  const { mainCategoryId, getSubCategoryAndItems } = useContext(
+  const { mainCategoryId, getSubCategoriesdata  } = useContext(
     AdminFormContext
   ) as AdminFormListData;
 
+
   useEffect(() => {
-    if (mainCategoryId && getSubCategoryAndItems.length > 0) {
+    if (mainCategoryId && getSubCategoriesdata.length > 0) {
       const key = mainCategoryId;
-      const items = getSubCategoryAndItems[0][key]?.map((item: { name: string }) => item.name) || [];
+      const items =
+        getSubCategoriesdata[0][key]?.map(
+          (item: { name: string }) => item.name
+        ) || [];
       setGetSubCategories(items);
     }
-  }, [mainCategoryId, getSubCategoryAndItems]);
+  }, [mainCategoryId, getSubCategoriesdata]);
 
-  const filterClickHandle = (item:string) =>{
-setFilterClickSubCategory(item)
-setFilterHandle(false)
-  }
+  const filterClickHandle = (item: string) => {
+    setFilterClickSubCategory(item);
+    setFilterHandle(false);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+      if (
+        filterRef.current &&
+        !filterRef.current.contains(event.target as Node)
+      ) {
         setFilterHandle(false);
       }
     };
@@ -39,6 +51,7 @@ setFilterHandle(false)
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   return (
     <div>
       <div className="flex w-full gap-4 justify-between items-center mb-7">
@@ -90,15 +103,39 @@ setFilterHandle(false)
           </button>
           {filterHandle && (
             <div ref={filterRef} className="absolute top-9 left-[164px] z-40">
-              <div className="border border-gray-400 rounded-md py-2   px-4 h-40 overflow-y-scroll bg-white text-xs flex flex-col gap-2">
-              <div  onClick={() => filterClickHandle('All')} className="flex  items-center gap-2 ">
-                    <input type="radio" name="subcategory" id={`subCategory`} />
-                    <label className="cursor-pointer  " htmlFor={`subCategory`}>All</label>
-                  </div>
+              <div className="border border-gray-400 rounded-md py-2 px-4 h-40 overflow-y-scroll bg-white text-xs flex flex-col gap-2">
+                <div
+                  onClick={() => filterClickHandle("All")}
+                  className="flex items-center gap-2"
+                >
+                  <input
+                    type="radio"
+                    name="subcategory"
+                    checked={filterClickSubCategory === "All"}
+                    id={`subCategory-All`}
+                  />
+                  <label className="cursor-pointer" htmlFor={`subCategory-All`}>
+                    All
+                  </label>
+                </div>
                 {getSubCategories.map((item, index) => (
-                  <div onClick={()=>filterClickHandle(item)} key={index} className="flex items-center gap-2  ">
-                    <input type="radio" name="subcategory" id={`subCategory-${index}`} />
-                    <label className="cursor-pointer  " htmlFor={`subCategory-${index}`}>{item}</label>
+                  <div
+                    onClick={() => filterClickHandle(item)}
+                    key={index}
+                    className="flex items-center gap-2"
+                  >
+                    <input
+                      type="radio"
+                      name="subcategory"
+                      checked={filterClickSubCategory === item}
+                      id={`subCategory-${index}`}
+                    />
+                    <label
+                      className="cursor-pointer"
+                      htmlFor={`subCategory-${index}`}
+                    >
+                      {item}
+                    </label>
                   </div>
                 ))}
               </div>
@@ -116,8 +153,8 @@ setFilterHandle(false)
             {filterClickSubCategory}
           </button>
           <div className="ml-auto text-gray-500 text-xs sm:inline-flex hidden items-center">
-            <span className="mr-3">1 / 4</span>
-            <button className="inline-flex mr-2 items-center h-8 w-8 justify-center text-gray-400 rounded-md shadow border border-gray-200 dark:border-gray-800 leading-none py-0">
+            <span className="mr-3"> 2/ 4</span>
+            <button onClick={() => paginate(currentPage - 1)} className="inline-flex mr-2 items-center h-8 w-8 justify-center text-gray-400 rounded-md shadow border border-gray-200 dark:border-gray-800 leading-none py-0">
               <svg
                 className="w-4"
                 viewBox="0 0 24 24"
@@ -130,7 +167,7 @@ setFilterHandle(false)
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
             </button>
-            <button className="inline-flex items-center h-8 w-8 justify-center text-gray-400 rounded-md shadow border border-gray-200 dark:border-gray-800 leading-none py-0">
+            <button onClick={() => paginate(currentPage + 1)} className="inline-flex items-center h-8 w-8 justify-center text-gray-400 rounded-md shadow border border-gray-200 dark:border-gray-800 leading-none py-0">
               <svg
                 className="w-4"
                 viewBox="0 0 24 24"

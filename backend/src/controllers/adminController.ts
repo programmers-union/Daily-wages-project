@@ -1,13 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import Admin from "../models/Admin";
 import Category from "../models/category";
-import SubCategory from "../models/SubCategory"
+import SubCategory from "../models/SubCategory";
 import Client from "../models/Client";
 import Employee from "../models/Employee";
 import bcrypt from "bcryptjs";
 import uploadIcon from "../config/cloudinaryConfig";
-
-
+import SubCategoryItem from "../models/SubCategoryItems";
 
 export const signupAdmin = async (
   req: Request,
@@ -29,7 +28,6 @@ export const signupAdmin = async (
     next(err);
   }
 };
-
 
 export const loginAdmin = async (
   req: Request,
@@ -54,24 +52,24 @@ export const loginAdmin = async (
   }
 };
 
-
-export const getCategories=async(
-  req:Request,
-  res:Response,
-  next:NextFunction
-)=>{
+export const getCategories = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const categories=await Category.find();
-  if(!categories){
-    return res.json({msg:"no categoriess found"});
-  };
-  // console.log(categories);
-  return res.status(200).json({msg:"categories fetched successfully",categories:categories});
+    const categories = await Category.find();
+    if (!categories) {
+      return res.json({ msg: "no categoriess found" });
+    }
+    // console.log(categories);
+    return res
+      .status(200)
+      .json({ msg: "categories fetched successfully", categories: categories });
   } catch (error) {
     next(error);
-  } 
+  }
 };
-
 
 export const getSubCategories = async (
   req: Request,
@@ -83,7 +81,7 @@ export const getSubCategories = async (
       {
         $lookup: {
           from: 'categories', 
-          localField: 'category',
+          localField: 'mainCategoryId',
           foreignField: '_id',
           as: 'categoryDetails'
         }
@@ -97,8 +95,10 @@ export const getSubCategories = async (
           categoryName: { $first: '$categoryDetails.categoryName' },
           subCategories: {
             $push: {
+              subCategoryId: '$_id', 
               name: '$name',
-              iconUrl: '$iconUrl'
+              iconUrl: '$iconUrl',
+
             }
           }
         }
@@ -118,20 +118,18 @@ export const getSubCategories = async (
       acc[item.categoryId] = item.subCategories;
       return acc;
     }, {});
-
     res.status(200).json([result]);
   } catch (error) {
     next(error);
   }
 };
 
-
 export const addCategoryData = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { categoryName,categoryIcon } = req.body;
+  const { categoryName, categoryIcon } = req.body;
   try {
     const category = await Category.findOne({ categoryName });
     if (category) {
@@ -143,41 +141,38 @@ export const addCategoryData = async (
 
     await newCategory.save();
     res.status(200).json({ msg: "category created successfully" });
-
   } catch (error) {
     next(error);
   }
 };
 
-
-export const addSubCategory=async (
-  req:Request,
-  res:Response,
-  next:NextFunction
-)=>{
-  const {name,category}=req.body;
-  const file=req.file;
+export const addSubCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { name, mainCategoryId } = req.body;
+  const file = req.file;
   try {
-    const subCategory=await SubCategory.findOne({name:name});
-    console.log("subCategory:",subCategory);
-    if(subCategory){
-      return res.json({msg:"already added"})
-    };
-
-    let iconUrl = '';
-  
-    if (file) {
-      
-        iconUrl = await uploadIcon(file.buffer);
-        console.log("iconUrl:",iconUrl);
+    const subCategory = await SubCategory.findOne({ name: name });
+    console.log("subCategory:", subCategory);
+    if (subCategory) {
+      return res.json({ msg: "already added" });
     }
 
-    const newSubCategory=new SubCategory({
+    let iconUrl = "";
+
+    if (file) {
+      iconUrl = await uploadIcon(file.buffer);
+      console.log("iconUrl:", iconUrl);
+    }
+
+    const newSubCategory = new SubCategory({
       name,
-      category,
-      iconUrl:iconUrl
+      mainCategoryId,
+      iconUrl: iconUrl,
     });
-    console.log("newSubCategory:",newSubCategory);
+    console.log("newSubCategory:", newSubCategory);
 
     await newSubCategory.save();
     console.log("three");
@@ -187,42 +182,121 @@ export const addSubCategory=async (
   }
 };
 
-
-export const getClientsData=async(
-  req:Request,
-  res:Response,
-  next:NextFunction
-)=>{
+export const getClientsData = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const clientsData=await Client.find({}, 'firstName email phoneNumber');
-    console.log("clientsdata:",clientsData);
-    if(!clientsData){
-      return res.status(404).json({msg:"no clients found"});
+    const clientsData = await Client.find({}, "firstName email phoneNumber");
+    console.log("clientsdata:", clientsData);
+    if (!clientsData) {
+      return res.status(404).json({ msg: "no clients found" });
     }
-    
-    return res.status(200).json({msg:"clientsData fetched successfully",clientsData});
+
+    return res
+      .status(200)
+      .json({ msg: "clientsData fetched successfully", clientsData });
   } catch (error) {
     next(error);
   }
 };
 
-
-export const getEmployeesData=async(
-  req:Request,
-  res:Response,
-  next:NextFunction
-)=>{
+export const getEmployeesData = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const employeesData=await Employee.find({}, 'firstName email phoneNumber');
-    console.log("EmployeesData:",employeesData);
-    if(!employeesData){
-      return res.status(404).json({msg:"no Empolyees found"})
+    const employeesData = await Employee.find(
+      {},
+      "firstName email phoneNumber"
+    );
+    console.log("EmployeesData:", employeesData);
+    if (!employeesData) {
+      return res.status(404).json({ msg: "no Empolyees found" });
     }
-    return res.status(404).json({msg:"EmployeesData fetched successfully",employeesData});
+    return res
+      .status(404)
+      .json({ msg: "EmployeesData fetched successfully", employeesData });
   } catch (error) {
     next(error);
   }
 };
 
+export const addSubCategoryItems = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {
+      image,
+      subCategory,
+      newSubCategory,
+      jobTitle,
+      description,
+      mainCategoryId,
+    } = req.body;
+    const file = req.file;
+    let subCategoryId = null;
+    let iconUrl = null;
+    if (newSubCategory) {
+      const existingSubCat = await SubCategory.findOne({
+        name: newSubCategory,
+      });
+      if (existingSubCat) {
+        return res.status(400).json({ message: "Subcategory already exists" });
+      }
+      if (file) {
+        iconUrl = await uploadIcon(file.buffer);
+      }
+      const newSubCat = new SubCategory({
+        name: newSubCategory,
+        mainCategoryId: mainCategoryId,
+        iconUrl: iconUrl,
+      });
+      const savedSubCat = await newSubCat.save();
+      subCategoryId = savedSubCat._id;
+    } else {
+      const existingSubCat = await SubCategory.findOne({ name: subCategory });
+      if (!existingSubCat) {
+        return res.status(400).json({ message: "Subcategory not found" });
+      }
 
+      subCategoryId = existingSubCat._id;
+    }
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, "0");
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const yyyy = today.getFullYear();
+    const formattedDate = `${mm}-${dd}-${yyyy}`;
 
+    const newSubCategoryItem = new SubCategoryItem({
+      jobTitle,
+      subCategoryId,
+      date: formattedDate,
+      description: description,
+    });
+    await newSubCategoryItem.save();
+    res.status(201).json({ msg: "Sub-category item added successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSubCategoryItems = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const subCategoryItems = await SubCategoryItem.find().populate('subCategoryId', 'name');
+    if (!subCategoryItems || subCategoryItems.length === 0) {
+      return res.status(404).json({ msg: "No subcategory data found" });
+    }
+    return res.status(200).json({ msg: "Subcategory items fetched successfully", subCategoryItems });
+  } catch (error) {
+    next(error);
+  }
+};

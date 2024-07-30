@@ -38,6 +38,11 @@ app.use('/api/employee', employeeRoutes);
 app.use('/api/auth', authRoutes);
 app.use(errorHandler);
 
+// app.use('/api/admin/some',(req,res)=>{
+// console.log(req.body)
+// })
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
