@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, useRef } from "react";
 import {
   AdminFormData,
   AdminFormListData,
+  Item,
   MainCategoryProps,
 } from "../../../types/AdminGategoryType";
 import AdminFormContext from "../../../context/modules/AdminFormContext";
@@ -9,18 +10,24 @@ import AdminFormContext from "../../../context/modules/AdminFormContext";
 const AddNewCategory: React.FC<MainCategoryProps> = ({
   setActiveAddCategoryPopup,
 }) => {
-  const [getSubCategories, setGetSubCategories] = useState<string[]>([]);
+  const [getSubCategories, setGetSubCategories] = useState<
+  {
+    name: string;
+    subId: {
+        name: string;
+    } | undefined;
+}[]
+  >([]);
   const [formData, setFormData] = useState<AdminFormData>({
     image: null,
-    category: "",
-    subcategory: "",
+    subCategory: "",
     newSubCategory: "",
     jobTitle: "",
     description: "",
-    date: "",
+    subCategoryId: "",
   });
 
-  const { AdminFormAdding, mainCategoryId, getSubCategoryAndItems } = useContext(
+  const { AdminFormAdding, mainCategoryId, getSubCategoriesdata } = useContext(
     AdminFormContext
   ) as AdminFormListData;
 
@@ -51,7 +58,7 @@ const AddNewCategory: React.FC<MainCategoryProps> = ({
 
     const updatedFormData = {
       ...formData,
-      id: mainCategoryId,
+      mainCategoryId: mainCategoryId,
     };
     console.log(updatedFormData, "updated");
     try {
@@ -64,9 +71,14 @@ const AddNewCategory: React.FC<MainCategoryProps> = ({
 
   useEffect(() => {
     const key = mainCategoryId;
-    const items = getSubCategoryAndItems[0][key].map((item: { name: string }) => item.name);
-    setGetSubCategories(items);
-  }, [mainCategoryId, getSubCategoryAndItems]);
+    if (getSubCategoriesdata.length > 0 && getSubCategoriesdata[0][key]) {
+      const items = getSubCategoriesdata[0][key].map((item: Item) => ({
+        name: item.name,
+        subId: item.subCategoryId,
+      }));
+      setGetSubCategories(items);
+    }
+  }, [mainCategoryId, getSubCategoriesdata]);
 
   console.log(getSubCategories, "getSubCategories####");
 
@@ -100,7 +112,7 @@ const AddNewCategory: React.FC<MainCategoryProps> = ({
 
   const handleAddNewSubcategory = () => {
     setIsAddingNewSubcategory(true);
-    setFormData({ ...formData, subcategory: "" });
+    setFormData({ ...formData, subCategory: "" });
   };
 
   return (
@@ -118,19 +130,6 @@ const AddNewCategory: React.FC<MainCategoryProps> = ({
             name="jobTitle"
             id="jobTitle"
             value={formData.jobTitle}
-            onChange={handleInputChange}
-            className="w-full px-3 py-1 border-b text-gray-700 outline-none"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="category">
-            Category
-          </label>
-          <input
-            type="text"
-            name="category"
-            id="category"
-            value={formData.category}
             onChange={handleInputChange}
             className="w-full px-3 py-1 border-b text-gray-700 outline-none"
           />
@@ -207,7 +206,7 @@ const AddNewCategory: React.FC<MainCategoryProps> = ({
                   aria-expanded={isOpen}
                   onClick={toggleDropdown}
                 >
-                  {formData.subcategory || "Select Subcategory"}
+                  {formData.subCategory || "Select Subcategory"}
                   <svg
                     className="-mr-1 ml-2 h-5 w-5"
                     xmlns="http://www.w3.org/2000/svg"
@@ -240,11 +239,15 @@ const AddNewCategory: React.FC<MainCategoryProps> = ({
                           className="block w-full text-start px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                           role="menuitem"
                           onClick={() => {
-                            setFormData({ ...formData, subcategory: subCat });
+                            setFormData({
+                              ...formData,
+                              subCategory: subCat.name,
+                              subCategoryId: subCat.subId,
+                            });
                             setIsOpen(false);
                           }}
                         >
-                          {subCat}
+                          {subCat.name}
                         </button>
                       ))}
                     </div>

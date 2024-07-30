@@ -9,7 +9,7 @@ const MainCategory: React.FC<MainCategoryProps> = ({ setActiveAddCategoryPopup }
   const [clickToChange, setClickToChange] = useState<number|string>(0); 
   const [mainCategory, setMainCategory] = useState<CategoryItem[]>([]);
 
-  const { setMainCategoryId} = useContext(AdminFormContext) as AdminFormListData;
+  const { setMainCategoryId  } = useContext(AdminFormContext) as AdminFormListData;
   
   useEffect(() => {
     const GetMainCategory = async () => {
@@ -17,7 +17,6 @@ const MainCategory: React.FC<MainCategoryProps> = ({ setActiveAddCategoryPopup }
         const response = await axios.get('http://localhost:5000/api/admin/get-main-categories');
         const categories = response.data.categories;
         setMainCategory(categories);
-
         // Set default category ID
         if (categories.length > 0) {
           setMainCategoryId(categories[0]._id);
@@ -35,7 +34,7 @@ const MainCategory: React.FC<MainCategoryProps> = ({ setActiveAddCategoryPopup }
       }
     };
     GetMainCategory();
-  }, [setMainCategoryId]);
+  }, [setMainCategoryId ]);
 
   const renderComponent = () => {
     switch (clickToChange) {
