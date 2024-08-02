@@ -12,6 +12,11 @@ export interface FormProgressProps {
   nextStep: () => void;
   prevStep: () => void;
 }
+export interface Item {
+  id: string;
+  name: string;
+  // other properties...
+}
 
 export interface AdminFormListData {
   AdminFormAdding: (formDataAdmin: AdminFormData) => Promise<void>;

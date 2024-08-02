@@ -15,9 +15,13 @@ import './App.css';
 import WorkerForm from "./components/worker/workerJobDetailsForm/WorkerForm";
 import CheckEmailANdPhone from "./auth/client/forgotPassword/CheckEmailANdPhone";
 import GoogleAuth from "./pages/googleAuthantication/GoogleAuth";
+import ClientCalendar from "./components/client/calendar/ClientCalendar";
+
 
 const App: React.FC = () => {
-  // 423334277355589
+
+
+
   return (
     <AppProvider>
       <Routes>
@@ -26,7 +30,7 @@ const App: React.FC = () => {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/worker-calendar" element={<WorkerCalendar />} />
-        <Route path="/client-calendar" element={<WorkerCalendar />} />
+        <Route path="/client-calendar" element={<ClientCalendar />} />
         <Route path="/worker-profile" element={<WorkerProfile />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/dashboard" element={<MainDashboard />} />

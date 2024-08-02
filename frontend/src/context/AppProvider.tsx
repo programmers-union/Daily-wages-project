@@ -4,13 +4,16 @@ import { OtpProvider } from './modules/OtpContext';
 import { ChildrenNode } from '../types/authTypes/AuthTypes';
 import { WorkerFormProvider } from './modules/WorkerFormData';
 import { AdminContext } from './modules/AdminFormContext';
+import { ClientProvider } from './modules/ClientFormContext';
 
 const AppProvider: FC<ChildrenNode> = ({ children }) => {
   return (
     <AuthProvider>
       <OtpProvider>
         <AdminContext>
+          <ClientProvider>
           <WorkerFormProvider>{children}</WorkerFormProvider>
+          </ClientProvider>
         </AdminContext>
       </OtpProvider>
     </AuthProvider>

@@ -1,3 +1,4 @@
+import { CookieOptions } from "express";
 
 export interface SignupClientRequestBody {
     firstName: string;

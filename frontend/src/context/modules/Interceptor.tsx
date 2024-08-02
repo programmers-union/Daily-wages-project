@@ -1,62 +1,49 @@
-import {jwtDecode} from 'jwt-decode';
 import axios from 'axios';
 
-interface JwtPayload {
-  exp?: number;
-}
+// Create an Axios instance
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:5000',
+  withCredentials: true,
+});
 
-const Interceptor = async (): Promise<string | null> => {
-  const getToken = (): string | null => localStorage.getItem('accessToken');
-  const setToken = (token: string): void => localStorage.setItem('accessToken', token);
-  const getRefreshToken = (): string | null => localStorage.getItem('refreshToken');
-
-  const isTokenExpired = (token: string): boolean => {
-    try {
-      const decoded = jwtDecode<JwtPayload>(token);
-      const now = Math.floor(Date.now() / 1000);
-      return decoded.exp ? decoded.exp < now : true;
-    } catch (error) {
-      console.error('Error decoding token:', error);
-      return true;
-    }
-  };
-
-  const refreshAccessToken = async (): Promise<string | null> => {
-    const refreshToken = getRefreshToken();
-    if (!refreshToken) return null;
-
-    try {
-      const response = await axios.post('/api/client/refreshToken', { refreshToken });
-      const newAccessToken = response.data.accessToken;
-      setToken(newAccessToken);
-      return newAccessToken;
-    } catch (error) {
-      console.error('Error refreshing token:', error);
-      return null;
-    }
-  };
-
-  let token = getToken();
-
-  if (!token) return null;
-
-  if (isTokenExpired(token)) {
-    token = await refreshAccessToken();
+// Function to handle token refresh
+const refreshToken = async (): Promise<string | null> => {
+  const refreshToken = localStorage.getItem('accessToken');
+  if (!refreshToken) {
+    console.error('No refresh token available');
+    return null;
   }
 
-  return token;
+  try {
+    const response = await axios.post('/api/client/refreshToken', { refreshToken });
+    const newAccessToken = response.data.accessToken;
+    localStorage.setItem('accessToken', newAccessToken);
+    return newAccessToken;
+  } catch (error) {
+    console.error('Error refreshing token:', error);
+    return null;
+  }
 };
 
-// Axios interceptor setup
-axios.interceptors.request.use(
-  async (config) => {
-    const token = await Interceptor();
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+// Add an interceptor to handle token refresh
+axiosInstance.interceptors.response.use(
+  response => response,
+  async error => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      const newAccessToken = await refreshToken();
+      if (newAccessToken) {
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+        return axiosInstance(originalRequest);
+      }
     }
-    return config;
-  },
-  (error) => Promise.reject(error)
+
+    return Promise.reject(error);
+  }
 );
 
-export default Interceptor;
+export default axiosInstance;

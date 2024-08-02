@@ -12,7 +12,7 @@ const OtpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const OTPSubmit = async (otp: OtpAndSignupType) => {
     try {
       console.log(otp,'&&&')
-      const response = await axios.patch('http://localhost:5000/api/client/verifyOtp', { otp });
+      const response = await axios.patch('http://localhost:5000/api/client/verifyOtp', { otp },{ withCredentials: true });
       const isCheckedToHome =  response.data
       const storeInLocalStorage = isCheckedToHome.accessToken 
       console.log(storeInLocalStorage,'((')
