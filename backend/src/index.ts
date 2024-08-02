@@ -4,13 +4,13 @@ import passport from 'passport';
 import session from 'express-session';
 import connectDB from './utils/db';
 import dotenv from 'dotenv';
-import cors from 'cors';
 import clientRoutes from './routes/clientRoutes';
 import adminRoutes from './routes/adminRoutes';
 import employeeRoutes from './routes/employeeRoutes';
 import authRoutes from './routes/authRoutes';
 import './config/googleAuthConfig';
 import { errorHandler } from './middlewares/errorMiddleware';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -26,7 +26,10 @@ app.use(
     })
 );
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', 
+    credentials: true, 
+  }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
@@ -37,10 +40,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/employee', employeeRoutes);
 app.use('/api/auth', authRoutes);
 app.use(errorHandler);
-
-// app.use('/api/admin/some',(req,res)=>{
-// console.log(req.body)
-// })
 
 
 const PORT = process.env.PORT || 5000;

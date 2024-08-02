@@ -84,6 +84,11 @@ const TableFilter: React.FC<MainCategoryTableProps> = ({
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </button>
+          {/* <div className="absolute top-10 left-4">
+ <div>
+
+ </div>
+          </div> */}
           <button
             onClick={() => setFilterHandle(true)}
             className="inline-flex items-center h-8 pl-2.5 pr-2 rounded-md shadow text-gray-700 dark:text-gray-400 dark:border-gray-800 border border-gray-200 leading-none py-0"

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../helpers/generateToken';
+import Client from '../models/Client';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -13,12 +14,17 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
         return res.status(500).send('Server configuration error. No secret defined.');
     }
 
-    const payload = verifyToken(token, secret);
-    if (payload) {
-        req.user = payload; // Attach payload to request if needed
-        next();
-    } else {
-        res.status(400).send('Invalid or expired access token.');
+    try {
+        const payload = verifyToken(token, secret);
+        if (payload && typeof payload !== 'string') {
+            // Assume payload can be safely cast to User type
+            req.user = payload as typeof Client;
+            next();
+        } else {
+            res.status(401).send('Invalid or expired access token.');
+        }
+    } catch (error) {
+        return res.status(401).send('Invalid or expired access token.');
     }
 };
 

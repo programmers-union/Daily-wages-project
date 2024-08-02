@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Admin from "../models/Admin";
-import Category from "../models/category";
+import Category from "../models/Category";
 import SubCategory from "../models/SubCategory";
 import Client from "../models/Client";
 import Employee from "../models/Employee";

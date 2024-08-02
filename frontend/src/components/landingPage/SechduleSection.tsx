@@ -1,12 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 // import calVideo from "../../assets/Screen Recording 2024-07-03 131739.mp4";
 import calendarS from '../../assets/calendarS.png'
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Interceptor from "../../context/modules/Interceptor";
 
 const ScheduleSection: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const [playbackRate, setPlaybackRate] = useState(2);
+  // const [playbackRate, setPlaybackRate] = useState(2)
+  const navigate = useNavigate();
+  const playbackRate = 2;
+
 
   useEffect(() => {
     const videoElement = videoRef.current;
@@ -67,6 +71,18 @@ const ScheduleSection: React.FC = () => {
     }
   }, [playbackRate]);
 
+  const accessHandle = async () => {
+    const getToken = (): string | null => localStorage.getItem('accessToken');
+    const access = getToken();
+
+    if (!access ) {
+      await Interceptor(); // Call the interceptor to handle token refresh
+      navigate('/login');
+    } else {
+      navigate('/client-calendar');
+    }
+  }
+
   return (
     <div className="flex justify-center items-center gap-10 h-screen px-10">
       <div className="w-full">
@@ -74,7 +90,7 @@ const ScheduleSection: React.FC = () => {
           <source src={calVideo} type="video/mp4" />
           Your browser does not support the video tag.
         </video> */}
-        <img className="w-full h-full" src={calendarS} alt="" />
+        <img className="w-full h-full" src={calendarS} alt="Calendar Screenshot" />
       </div>
       <div className="w-full">
         <h1 className="text-slate-900 font-normal text-2xl">
@@ -84,11 +100,10 @@ const ScheduleSection: React.FC = () => {
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis
           aspernatur est distinctio voluptas doloribus modi!
         </p>
-        <Link to='/client-calendar'>
-        <button className="px-6 py-1 bg-custom-gradient text-sm border rounded-full mt-6">
+
+        <button onClick={accessHandle} className="px-6 py-1 bg-custom-gradient text-sm border rounded-full mt-6">
           Schedule
         </button>
-        </Link>
       </div>
     </div>
   );

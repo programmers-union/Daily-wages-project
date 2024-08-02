@@ -9,20 +9,7 @@ import MainSide from './sideSection/MainSide';
 
 const DashboardPage: React.FC = () => {
     const [activeAddCategoryPopup, setActiveAddCategoryPopup] = useState<boolean>(false);
-    // const subCategories = [
-    //     'Cleaning', 'Laundry and Clothing Care', 'Organization', 'Maintenance and Repair',
-    //     'Outdoor Tasks', 'Pet Care', 'Plant and Garden Care', 'Vehicle Care', 'Food and Kitchen Services',
-    //     'Childcare and Supervision', 'Home and Property Services', 'Errands and Personal Assistance',
-    //     'Event and Hospitality Services', 'Outdoor and Recreational Services', 'Odd Jobs and Miscellaneous Tasks',
-    //     'Administrative and Data Services', 'Specialized Cleaning', 'Agricultural Tasks'
-    //   ];
-  
-      
-    const topNavLeft = [
-        'Home',
-        'Name'
-    ];
-      
+
     const topNavRight = [
         'jin',
         'hungu'
@@ -66,6 +53,7 @@ const DashboardPage: React.FC = () => {
               "http://localhost:5000/api/admin/get-sub-category-items"
             );
             const categories = response.data.subCategoryItems;
+            console.log(categories,'length')
             setGetSubCategoriesItemsDatas(categories);
     
             console.log("Categories fetched", response.data);
@@ -98,11 +86,6 @@ const DashboardPage: React.FC = () => {
             <section className="box-border relative w-full ml-[240px] h-screen overflow-y-scroll">
                 <nav className=" bg-slate-100 shadow-sm z-[11] sticky top-0 box-border inline-flex flex-grow w-full  py-6 pr-6 overflow-hidden">
                     <div className="top-nav-left flex flex-grow items-start">
-                        <ul className="flex self-center">
-                            {topNavLeft.map((nav, index) => (
-                                <li className="text-gray-700" key={index}>{nav}</li>
-                            ))}
-                        </ul>
                         <div className="inline-flex self-center">
                             <input className="min-w-[250px] ml-2 px-4 h-8 content-center shadow rounded-l" type="text" placeholder="Press / to focus search" />
                             <button className="btn inline-block text-white text-core bg-green-500 hover:bg-green-600 h-8 px-2 py-1 -ml-1 rounded-r shadow">

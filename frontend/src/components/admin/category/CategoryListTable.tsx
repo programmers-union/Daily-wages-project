@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   AdminFormListData,
-  Item,
   MainCategoryProps,
 } from "../../../types/AdminGategoryType";
 import TableFilter from "./TableFilter";
@@ -14,13 +13,13 @@ const CategoryListTable: React.FC<MainCategoryProps> = ({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 8;
 
-  const TableHeadContent = ["No", "Name", "Category", "Date"];
+  const TableHeadContent = ["No", "Name", "Sub Category", "Date"];
 
   const filterRef = useRef<HTMLDivElement>(null);
   const { getSubCategoriesItemsDatas } = useContext(
     AdminFormContext
   ) as AdminFormListData;
-
+console.log(getSubCategoriesItemsDatas,'zeroooooo')
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

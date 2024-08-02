@@ -17,6 +17,10 @@ import {
   LoginRequestBody,
 } from "client/requests";
 import { ErrorResponse, SuccessResponse } from "client/response";
+import findClosestJobTitle from "../utils/matchTitle";
+import JobRequest from "../models/JobRequest";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const signupClient = async (
   req: Request<{}, {}, SignupClientRequestBody>,
@@ -42,6 +46,7 @@ export const signupClient = async (
     }
 
     const otp = generateOtp();
+    console.log("otppp:", otp);
     const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
 
     const salt = await bcrypt.genSalt(10);
@@ -99,19 +104,19 @@ export const verifyOtp = async (
 
     res.cookie("jwtRefreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "strict",
+       secure: true,
+       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+      path: "/",
     });
 
-    res
-      .status(200)
-      .json({
-        msg: "OTP verified successfully",
-        otpVerified: true,
-        accessToken: accessToken,
-        expiresIn: expiresIn,
-      });
+
+    res.status(200).json({
+      msg: "OTP verified successfully",
+      otpVerified: true,
+      accessToken: accessToken,
+      expiresIn: expiresIn,
+    });
   } catch (error) {
     next(error);
   }
@@ -122,19 +127,19 @@ export const resendOtp = async (
   res: Response<SuccessResponse | ErrorResponse>,
   next: NextFunction
 ) => {
-  console.log('one')
-  const  email  = req.body.otp.signup;
-console.log(email,'emil')
+  console.log("one");
+  const email = req.body.otp.signup;
+  console.log(email, "emil");
   try {
     const client = await Client.findOne({ email });
-console.log(client ,'clie')
+    console.log(client, "clie");
     if (!client) {
       return res.status(404).json({ msg: "Client not found" });
     }
     const otp = generateOtp();
-    const otpExpiry=new Date(Date.now() + 15 * 60 * 1000);
+    const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
     client.otp = otp;
-    client.otpExpiry=otpExpiry;
+    client.otpExpiry = otpExpiry;
     await client.save();
     await sendOtpToUser(client.phoneNumber as string, otp);
     res.status(200).json({ msg: "OTP resent successfully" });
@@ -206,10 +211,10 @@ export const forgotPassword = async (
   res: Response<{ msg: string; signUp?: boolean }>,
   next: NextFunction
 ) => {
-  console.log('first')
+  console.log("first");
   const { forgotPassword, forgotCheckBox } = req.query;
-console.log(forgotCheckBox,'90')
-console.log(forgotCheckBox,'100')
+  console.log(forgotCheckBox, "90");
+  console.log(forgotCheckBox, "100");
   try {
     if (!forgotPassword) {
       return res.status(400).json({ msg: "Identifier is required" });
@@ -276,6 +281,7 @@ export const refreshToken = async (
   next: NextFunction
 ) => {
   console.log("here");
+  console.log(req.body)
   const refreshToken = req.cookies.jwtRefreshToken;
   console.log("refreshToken:", refreshToken);
 
@@ -299,6 +305,7 @@ export const refreshToken = async (
     return res.status(403).json({ message: "Invalid refresh token" });
   }
 
+
   try {
     const client = await Client.findById(payload.userId);
     console.log("client:", client);
@@ -308,7 +315,8 @@ export const refreshToken = async (
     }
 
     const newAccessToken = generateAccessToken(client._id);
-    return res.json({ accessToken: newAccessToken });
+    console.log(newAccessToken,'&&&&&&&&&&&&&')
+    return res.json({ accessToken: newAccessToken , msg:'new Aceess token generated' });
   } catch (error) {
     next(error);
   }
@@ -317,4 +325,39 @@ export const refreshToken = async (
 export const checkToken = (req: Request, res: Response, next: NextFunction) => {
   console.log(req.body);
   res.json({ msg: "hey i am back" });
+};
+
+export const handleJobRequest = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { jobTitle, date, time, description, location } = req.body;
+
+    const dateOnly = new Date(date);
+    if (isNaN(dateOnly.getTime())) {
+      return res.status(400).json({ msg: "Invalid date format" });
+    }
+
+    // Find closest job title
+    const closestItem = await findClosestJobTitle(jobTitle);
+    if (!closestItem) {
+      return res.status(404).json({ msg: "No matching job title found" });
+    }
+    // Create and save new job request
+    const newJobRequest = new JobRequest({
+      jobTitle: closestItem._id,
+      date: dateOnly,
+      time,
+      description,
+      location,
+    });
+
+    await newJobRequest.save();
+    return res.status(201).json({ msg: "Job request added successfully" });
+  } catch (error) {
+    console.error("Error in handleJobRequest:", error);
+    next(error);
+  }
 };
