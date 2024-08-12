@@ -104,12 +104,11 @@ export const verifyOtp = async (
 
     res.cookie("jwtRefreshToken", refreshToken, {
       httpOnly: true,
-       secure: true,
-       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
       path: "/",
     });
-
 
     res.status(200).json({
       msg: "OTP verified successfully",
@@ -280,61 +279,52 @@ export const refreshToken = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log("here");
-  console.log(req.body)
+  console.log('toen is success')
   const refreshToken = req.cookies.jwtRefreshToken;
-  console.log("refreshToken:", refreshToken);
+  console.log(refreshToken,'.....')
 
   if (!refreshToken) {
     return res.status(401).json({ message: "Refresh token required" });
   }
 
   const secret = process.env.REFRESH_TOKEN_SECRET;
-  console.log("REFRESH_TOKEN_SECRET:", secret);
-
   if (!secret) {
     return res
       .status(500)
       .json({ message: "Server configuration error. No secret defined." });
   }
 
-  const payload = verifyToken(refreshToken, secret);
-  console.log("payload:", payload);
-
-  if (!payload || typeof payload !== "object" || !("userId" in payload)) {
-    return res.status(403).json({ message: "Invalid refresh token" });
-  }
-
-
   try {
+    const payload = verifyToken(refreshToken, secret);
+    if (!payload || typeof payload !== "object" || !("userId" in payload)) {
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+
     const client = await Client.findById(payload.userId);
-    console.log("client:", client);
 
     if (!client || client.refreshToken !== refreshToken) {
       return res.status(403).json({ message: "Invalid refresh token" });
     }
 
     const newAccessToken = generateAccessToken(client._id);
-    console.log(newAccessToken,'&&&&&&&&&&&&&')
-    return res.json({ accessToken: newAccessToken , msg:'new Aceess token generated' });
+    return res.json({ accessToken: newAccessToken });
   } catch (error) {
-    next(error);
+    console.error("Error in refreshToken:", error);
+    return res.status(403).json({ message: "Invalid refresh token" });
   }
 };
 
-export const checkToken = (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body);
-  res.json({ msg: "hey i am back" });
-};
 
 export const handleJobRequest = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  console.log(req.body,'...body....')
   try {
+    console.log(req.body,'...body....')
     const { jobTitle, date, time, description, location } = req.body;
-
+    const userId=(req as any).userId;
     const dateOnly = new Date(date);
     if (isNaN(dateOnly.getTime())) {
       return res.status(400).json({ msg: "Invalid date format" });
@@ -352,12 +342,44 @@ export const handleJobRequest = async (
       time,
       description,
       location,
+      userId:userId
     });
 
     await newJobRequest.save();
+    console.log("saved successfully");
     return res.status(201).json({ msg: "Job request added successfully" });
   } catch (error) {
     console.error("Error in handleJobRequest:", error);
+    next(error);
+  }
+};
+
+export const getjobDataForCalender = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = (req as any).userId;
+    console.log("userId", userId);
+
+    if (!userId) {
+      return res.status(403).send("User not authenticated");
+    }
+
+    const calenderData = await JobRequest.find({ userId: userId }).populate({
+      path: 'jobTitle',
+      select: 'jobTitle' 
+    });
+  
+    console.log("dataaaa:", calenderData);
+
+    if (calenderData && calenderData.length > 0) {
+      return res.status(200).json({ msg: "Successfully fetched the data", data: calenderData });
+    } else {
+      return res.status(404).json({ msg: "No data found" });
+    }
+  } catch (error) {
     next(error);
   }
 };

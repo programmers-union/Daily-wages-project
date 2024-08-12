@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 // import calVideo from "../../assets/Screen Recording 2024-07-03 131739.mp4";
 import calendarS from '../../assets/calendarS.png'
 import { useNavigate } from "react-router-dom";
-import Interceptor from "../../context/modules/Interceptor";
 
 const ScheduleSection: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -75,8 +74,7 @@ const ScheduleSection: React.FC = () => {
     const getToken = (): string | null => localStorage.getItem('accessToken');
     const access = getToken();
 
-    if (!access ) {
-      await Interceptor(); // Call the interceptor to handle token refresh
+    if (!access ) { // Call the interceptor to handle token refresh
       navigate('/login');
     } else {
       navigate('/client-calendar');

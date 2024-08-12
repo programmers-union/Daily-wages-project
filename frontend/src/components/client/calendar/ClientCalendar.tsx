@@ -1,84 +1,124 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
+import { Calendar, momentLocalizer, SlotInfo } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import JobRequestForm from "./JobRequestForm";
 import AdminFormContext from "../../../context/modules/AdminFormContext";
 import { AdminFormListData } from "../../../types/AdminGategoryType";
 import axios from "axios";
+import { axiosInterceptorPage } from "../../../context/modules/Interceptor";
+import EventPopup from "./EventPopup";
 
-// Create a localizer
 const localizer = momentLocalizer(moment);
 
-// Sample events
-const events = [
-  {
-    title: "Sample Event",
-    start: new Date(),
-    end: new Date(moment().add(1, "hours").toDate()),
-  },
-];
+interface CalendarEvent {
+  title: string;
+  start: Date;
+  end: Date;
+  description: string;
+  location: string;
+}
 
 const ClientCalendar: React.FC = () => {
   const [isActive, setIsActive] = useState<boolean>(false);
   const [calendarDate, setCalendarDate] = useState<string | null>(null);
+  const [getCalendarData, setGetCalendarData] = useState<CalendarEvent[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
 
-
-  // Handle event click
-  const handleEventClick = (event: { title: string; start: Date; end: Date }) => {
-    alert(`Event clicked: ${event.title} on ${moment(event.start).format('MMMM Do YYYY, h:mm:ss a')}`);
+  const handleEventClick = (event: CalendarEvent) => {
+    // alert(`Event clicked: ${event.title} on ${moment(event.start).format('MMMM Do YYYY, h:mm:ss a')}`);
+    setSelectedEvent(event);
   };
 
-  // Handle slot (date/time) click
-  const handleSlotClick = ({ start }: { start: Date }) => {
+  const handleSlotClick = (slotInfo: SlotInfo) => {
+    setCalendarDate(moment(slotInfo.start).format('MMMM Do YYYY'));
     setIsActive(true);
-    setCalendarDate(moment(start).format('MMMM Do YYYY'))
-    // alert(`Slot clicked: ${moment(start).format('MMMM Do YYYY, h:mm:ss a')}`);
   };
 
-  const { setGetSubCategoriesItemsDatas } = useContext(
-    AdminFormContext
-  ) as AdminFormListData;
+  const { setGetSubCategoriesItemsDatas } = useContext(AdminFormContext) as AdminFormListData;
 
   useEffect(() => {
-    const GetMainCategory = async () => {
+    const axiosInstance = axiosInterceptorPage();
+    const getCalendarDate = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/admin/get-sub-category-items"
-        );
+        const response = await axiosInstance.get('http://localhost:5000/api/client/calender-show-data');
+        console.log(response.data, 'response.data');
+        if (response.data && Array.isArray(response.data.data)) {
+          const formattedData = response.data.data.map((event: any) => {
+            const [year, month, day] = event.date.split('T')[0].split('-');
+            const [hours, minutes] = event.time.split(':');
+            const startDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes));
+            const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); 
+            return {
+              id:event._id,           
+              title: event.jobTitle.jobTitle,
+              start: startDate,
+              end: endDate,
+              description: event.description,
+              location: event.location,
+            };
+          });
+          setGetCalendarData(formattedData);
+        } else {
+          console.log(response.data.msg);
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          console.error("Error fetching calendar data:", error.response?.data?.message);
+        } else {
+          console.error("An unexpected error occurred:", error);
+        }
+      }
+    };
+    getCalendarDate();
+  }, []);
+
+  useEffect(() => {
+    const axiosInstance = axiosInterceptorPage();
+    const getMainCategory = async () => {
+      try {
+        const response = await axiosInstance.get("http://localhost:5000/api/admin/get-sub-category-items");
         const categories = response.data.subCategoryItems;
         setGetSubCategoriesItemsDatas(categories);
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          console.error(
-            "Error fetching categories:",
-            error.response?.data?.message
-          );
-          throw error.response?.data?.message || "Error fetching categories";
+          console.error("Error fetching categories:", error.response?.data?.message);
         } else {
           console.error("An unexpected error occurred:", error);
-          throw "An unexpected error occurred";
         }
       }
     };
-    GetMainCategory();
+    getMainCategory();
   }, [setGetSubCategoriesItemsDatas]);
+
+  console.log(getCalendarData, 'getCalendarData');
 
   return (
     <>
-      <div className="p-6">
+      <div className="p-6 helvetic">
         <Calendar
+          views={["day", "agenda", "work_week", "month"]}
           localizer={localizer}
-          events={events}
+          defaultDate={new Date()}
+          defaultView="month"
+          events={getCalendarData}
           startAccessor="start"
           endAccessor="end"
+          selectable={true}  // Enable selecting slots
           onSelectEvent={handleEventClick}
           onSelectSlot={handleSlotClick}
-          selectable
-          style={{ height: 500, cursor: "pointer" }}
+          style={{ height: "90vh", cursor: "pointer",fontSize: "12px" }}
         />
       </div>
-      {isActive && <JobRequestForm calendarDate={calendarDate} setIsActive={setIsActive} />}
+      {selectedEvent && (
+      <EventPopup
+        event={selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+      />
+    )}
+      {isActive && (
+        <JobRequestForm calendarDate={calendarDate} setIsActive={setIsActive} />
+      )}
     </>
   );
 };

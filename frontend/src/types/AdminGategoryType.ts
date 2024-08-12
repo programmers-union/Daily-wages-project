@@ -4,7 +4,7 @@ export interface AdminFormData {
   jobTitle: string;
   newSubCategory: string;
   description: string;
-  subCategoryId: string;
+  subCategoryId: string | undefined;
 }
 
 export interface FormProgressProps {

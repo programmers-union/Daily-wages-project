@@ -19,7 +19,6 @@ const CategoryListTable: React.FC<MainCategoryProps> = ({
   const { getSubCategoriesItemsDatas } = useContext(
     AdminFormContext
   ) as AdminFormListData;
-console.log(getSubCategoriesItemsDatas,'zeroooooo')
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

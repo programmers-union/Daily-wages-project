@@ -6,19 +6,27 @@ import { useNavigate } from 'react-router-dom';
 const OtpContext = createContext<OtpContextType | undefined>(undefined);
 
 const OtpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [forgotCheckBox , setForgotCheckBox] =useState<string>('')
+  const [forgotCheckBox, setForgotCheckBox] = useState<string>('');
   const navigate = useNavigate();
 
   const OTPSubmit = async (otp: OtpAndSignupType) => {
     try {
-      console.log(otp,'&&&')
-      const response = await axios.patch('http://localhost:5000/api/client/verifyOtp', { otp },{ withCredentials: true });
-      const isCheckedToHome =  response.data
-      const storeInLocalStorage = isCheckedToHome.accessToken 
-      console.log(storeInLocalStorage,'((')
-      localStorage.setItem('accessToken',storeInLocalStorage)
-      if(isCheckedToHome.otpVerified === true) {
-        navigate('/home')
+      console.log(otp, '&&&');
+      const response = await axios.patch('http://localhost:5000/api/client/verifyOtp', { otp }, { withCredentials: true });
+      const isCheckedToHome = response.data;
+
+      // Ensure accessToken is a string before storing it
+      const storeInLocalStorage = isCheckedToHome.accessToken;
+      console.log(storeInLocalStorage, '((');
+
+      if (typeof storeInLocalStorage === 'string') {
+        localStorage.setItem('accessToken', storeInLocalStorage);
+      } else {
+        console.error('Access token is not a string:', storeInLocalStorage);
+      }
+
+      if (isCheckedToHome.otpVerified === true) {
+        navigate('/home');
       }
     } catch (error) {
       console.error('OTP submit error', error);
@@ -26,9 +34,9 @@ const OtpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   const OTPReset = async (otp: OtpAndSignupType) => {
-    console.log(otp,'otp otp otp')
+    console.log(otp, 'otp otp otp');
     try {
-      const response = await axios.post('http://localhost:5000/api/client/resendOtp', { otp,forgotCheckBox });
+      const response = await axios.post('http://localhost:5000/api/client/resendOtp', { otp, forgotCheckBox });
       console.log('Reset OTP started', response.data);
       // Update state as needed
     } catch (error) {
@@ -42,7 +50,7 @@ const OtpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
     try {
       const response = await axios.get('http://localhost:5000/api/client/forgot-password', {
-        params: { forgotPassword ,forgotCheckBox },
+        params: { forgotPassword, forgotCheckBox },
       });
       console.log('Forgot password request started', response.data);
     } catch (error) {
@@ -61,18 +69,8 @@ const OtpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
-  // const ForgotOTPSubmit = async (otp: OtpAndSignupType) => {
-  //   try {
-  //     const response = await axios.post('http://localhost:5000/api/client/forgotVerifyOtp', { otp });
-  //     console.log('OTP submit started', response.data);
-  //     // Navigate or update state as needed
-  //   } catch (error) {
-  //     console.error('OTP submit error', error);
-  //   }
-  // };
-
   return (
-    <OtpContext.Provider value={{ OTPSubmit, OTPReset, ForgotPassword, ForgotPasswordOtp , setForgotCheckBox }}>
+    <OtpContext.Provider value={{ OTPSubmit, OTPReset, ForgotPassword, ForgotPasswordOtp, setForgotCheckBox }}>
       {children}
     </OtpContext.Provider>
   );
