@@ -57,7 +57,6 @@ const JobRequestForm: React.FC<PropsData> = ({ setIsActive, calendarDate }) => {
     ClientCalendarAddForm(calendarAddData);
     setIsActive(false);
   };
-
   const toggleMapLocation = () => {
     setMapLocation((prev) => !prev);
   };

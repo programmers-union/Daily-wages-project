@@ -9,7 +9,7 @@ export const AdminContext: FC<ChildrenNode> = ({ children }) => {
   const [mainCategoryId, setMainCategoryId] = useState<string>('');
   const [subCategoryId, setSubCategoryId] = useState<string>('');
   const [getSubCategoriesdata, setGetSubCategories] = useState<GetSubCategoryAndItems>([]);
-  const [getSubCategoriesItemsDatas, setGetSubCategoriesItemsDatas] = useState<Item[]>([]); // Changed to Item[]
+  const [getSubCategoriesItemsDatas, setGetSubCategoriesItemsDatas] = useState<Item[]>([]); 
 
   const AdminFormAdding = async (formDataAdmin: AdminFormData) => {
     console.log(formDataAdmin, 'adding form data ....')

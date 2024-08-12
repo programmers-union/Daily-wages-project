@@ -24,7 +24,7 @@ const AddNewCategory: React.FC<MainCategoryProps> = ({
     newSubCategory: "",
     jobTitle: "",
     description: "",
-    subCategoryId: "",
+    subCategoryId: undefined,
   });
 
   const { AdminFormAdding, mainCategoryId, getSubCategoriesdata } = useContext(
@@ -60,7 +60,7 @@ const AddNewCategory: React.FC<MainCategoryProps> = ({
       ...formData,
       mainCategoryId: mainCategoryId,
     };
-    console.log(updatedFormData, "updated");
+
     try {
       AdminFormAdding(updatedFormData);
       setActiveAddCategoryPopup(false);
@@ -80,7 +80,6 @@ const AddNewCategory: React.FC<MainCategoryProps> = ({
     }
   }, [mainCategoryId, getSubCategoriesdata]);
 
-  console.log(getSubCategories, "getSubCategories####");
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isAddingNewSubcategory, setIsAddingNewSubcategory] =

@@ -8,9 +8,6 @@ cloudinary.config({
     api_key:'331399461538636',
     api_secret:'m0X1c8B3JAwD-OrtI5Efdl4Wvyk'
 })
-
-
-
 const uploadIcon = async (buffer: Buffer): Promise<string> => {
     console.log("here with buffer");
     console.log("bufferr:",buffer);
@@ -26,5 +23,4 @@ const uploadIcon = async (buffer: Buffer): Promise<string> => {
         
     })
 }
-
 export default uploadIcon;

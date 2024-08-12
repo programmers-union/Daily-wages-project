@@ -29,7 +29,6 @@ const DashboardPage: React.FC = () => {
             const categories = response.data;
             setGetSubCategories(categories);
     
-            console.log("Categories fetched", response.data);
           } catch (error) {
             if (axios.isAxiosError(error)) {
               console.error(
@@ -53,10 +52,8 @@ const DashboardPage: React.FC = () => {
               "http://localhost:5000/api/admin/get-sub-category-items"
             );
             const categories = response.data.subCategoryItems;
-            console.log(categories,'length')
             setGetSubCategoriesItemsDatas(categories);
     
-            console.log("Categories fetched", response.data);
           } catch (error) {
             if (axios.isAxiosError(error)) {
               console.error(

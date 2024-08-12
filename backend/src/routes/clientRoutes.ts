@@ -10,9 +10,10 @@ import {
   forgotPassword,
   changePassword,
   refreshToken,
-  checkToken,
   handleJobRequest,
+  getjobDataForCalender,
 } from "../controllers/clientController";
+
 const router = Router();
 
 router.post("/signup", validateClientSignup, signupClient);
@@ -22,8 +23,8 @@ router.get("/loginMailCheck", loginMailCheck);
 router.post("/login", loginClient);
 router.get("/forgot-password", forgotPassword);
 router.patch("/changePassword", changePassword);
-router.post("/refreshToken", refreshToken);
-router.post("/checkToken", authMiddleware, checkToken);
+router.post("/refresh-token", refreshToken);
 router.post("/client-job-request", authMiddleware, handleJobRequest);
+router.get('/calender-show-data',authMiddleware,getjobDataForCalender);
 
 export default router;

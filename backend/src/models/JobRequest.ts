@@ -7,7 +7,7 @@ export interface IjobRequst extends Document{
     time:string,
     description:string,
     location:string,
-
+    userId:mongoose.Schema.Types.ObjectId;
 }
 
 const JobRequestSchema:Schema=new Schema({
@@ -31,6 +31,11 @@ const JobRequestSchema:Schema=new Schema({
     location:{
         type:String,
         required:true
+    },
+    userId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Client',
+        required:true,
     }
 });
 

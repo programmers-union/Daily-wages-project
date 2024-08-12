@@ -22,7 +22,6 @@ const MainCategory: React.FC<MainCategoryProps> = ({ setActiveAddCategoryPopup }
           setMainCategoryId(categories[0]._id);
         }
 
-        console.log('Categories fetched', response.data);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           console.error("Error fetching categories:", error.response?.data?.message);
