@@ -1,14 +1,11 @@
 import mongoose,{Schema,Document} from "mongoose";
+import { IUser } from "./Client";
 
-export interface IEmployee extends Document {
-    firstName:string,
-    lastName:string,
-    email:string,
-    password:string,
-    phoneNumber:string,
-    otp?:string,
-    otpExpiry:Date,
-    isVerified:Boolean
+export interface IEmployee extends IUser {
+    firstName: string;
+    lastName: string;
+    password: string;
+    isVerified: boolean;
 }
 
 const EmployeeSchema: Schema = new Schema({
@@ -25,4 +22,3 @@ const EmployeeSchema: Schema = new Schema({
 const Employee=mongoose.model<IEmployee>('Employee',EmployeeSchema);
 
 export default Employee;
-

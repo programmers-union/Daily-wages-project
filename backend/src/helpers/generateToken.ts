@@ -8,7 +8,7 @@ export const generateAccessToken = (userId: any): any => {
      
     
     const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
-    // console.log("accessTokenSecret:",accessTokenSecret);
+    console.log("accessTokenSecret:",accessTokenSecret);
     if (!accessTokenSecret) {
         throw new Error('ACCESS_TOKEN_SECRET is not defined');
     }
@@ -22,7 +22,7 @@ export const generateRefreshToken = (userId: string): string => {
           
     // Ensure REFRESH_TOKEN_SECRET is defined
     const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
-    // console.log("refreshTokenSecret:",refreshTokenSecret);
+    console.log("refreshTokenSecret:",refreshTokenSecret);
     
     if (!refreshTokenSecret) {
         throw new Error('REFRESH_TOKEN_SECRET is not defined');
@@ -31,9 +31,12 @@ export const generateRefreshToken = (userId: string): string => {
     return jwt.sign(payload, refreshTokenSecret, { expiresIn: '5d' });
 };
 
+
 export const verifyToken = (token: string, secret: string): JwtPayload | null => {
     try {
+        
         const decoded = jwt.verify(token, secret) as JwtPayload;
+        console.log('Token verified successfully:', decoded);
         return decoded;
     } catch (error) {
         console.error('Token verification failed:', error);
@@ -56,3 +59,4 @@ export const getUserIdFromToken = (token: string): string | null => {
     
     return null;
 };
+

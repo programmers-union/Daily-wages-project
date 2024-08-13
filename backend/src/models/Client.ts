@@ -1,13 +1,19 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export interface IClient extends Document {
+
+export interface IUser extends Document {
+    email?: string;
+    phoneNumber?: string;
+    otp?: string;
+    otpExpiry?: Date;
+    password?:string
+  }
+
+
+export interface IClient extends IUser {
     firstName: string;
     lastName: string;
-    email: string;
     password: string;
-    phoneNumber: string;
-    otp?:string;
-    otpExpiry?:Date;
     isVerified:Boolean;
     refreshToken:string;
 }

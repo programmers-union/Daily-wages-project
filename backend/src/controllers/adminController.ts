@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import Admin from "../models/Admin";
-import Category from "../models/Category";
+import Category from "../models/category";
 import SubCategory from "../models/SubCategory";
 import Client from "../models/Client";
 import Employee from "../models/Employee";
 import bcrypt from "bcryptjs";
 import uploadIcon from "../config/cloudinaryConfig";
 import SubCategoryItem from "../models/SubCategoryItems";
+
 
 export const signupAdmin = async (
   req: Request,
@@ -80,67 +81,44 @@ export const getSubCategories = async (
     const subCategories = await SubCategory.aggregate([
       {
         $lookup: {
-          from: 'categories', 
-          localField: 'mainCategoryId',
-          foreignField: '_id',
-          as: 'categoryDetails'
-        }
+          from: "categories",
+          localField: "mainCategoryId",
+          foreignField: "_id",
+          as: "categoryDetails",
+        },
       },
       {
-        $unwind: '$categoryDetails'
+        $unwind: "$categoryDetails",
       },
       {
         $group: {
-          _id: '$categoryDetails._id',
-          categoryName: { $first: '$categoryDetails.categoryName' },
+          _id: "$categoryDetails._id",
+          categoryName: { $first: "$categoryDetails.categoryName" },
           subCategories: {
             $push: {
-              subCategoryId: '$_id', 
-              name: '$name',
-              iconUrl: '$iconUrl',
-
-            }
-          }
-        }
+              subCategoryId: "$_id",
+              name: "$name",
+              iconUrl: "$iconUrl",
+            },
+          },
+        },
       },
       {
         $project: {
           _id: 0,
-          categoryId: '$_id',
+          categoryId: "$_id",
           categoryName: 1,
-          subCategories: 1
-        }
-      }
+          subCategories: 1,
+        },
+      },
     ]);
 
-    
     const result = subCategories.reduce((acc, item) => {
       acc[item.categoryId] = item.subCategories;
       return acc;
     }, {});
+    console.log("resulttttttttttt:", result);
     res.status(200).json([result]);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const addCategoryData = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { categoryName, categoryIcon } = req.body;
-  try {
-    const category = await Category.findOne({ categoryName });
-    if (category) {
-      return res.status(409).json({ msg: "Category already exist" });
-    }
-    const newCategory = new Category({
-      categoryName,
-    });
-
-    await newCategory.save();
-    res.status(200).json({ msg: "category created successfully" });
   } catch (error) {
     next(error);
   }
@@ -153,6 +131,11 @@ export const addSubCategory = async (
 ) => {
   const { name, mainCategoryId } = req.body;
   const file = req.file;
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, "0");
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const yyyy = today.getFullYear();
+  const formattedDate = `${mm}-${dd}-${yyyy}`;
   try {
     const subCategory = await SubCategory.findOne({ name: name });
     console.log("subCategory:", subCategory);
@@ -171,6 +154,7 @@ export const addSubCategory = async (
       name,
       mainCategoryId,
       iconUrl: iconUrl,
+      date: formattedDate,
     });
     console.log("newSubCategory:", newSubCategory);
 
@@ -217,7 +201,7 @@ export const getEmployeesData = async (
       return res.status(404).json({ msg: "no Empolyees found" });
     }
     return res
-      .status(404)
+      .status(200)
       .json({ msg: "EmployeesData fetched successfully", employeesData });
   } catch (error) {
     next(error);
@@ -259,27 +243,25 @@ export const addSubCategoryItems = async (
       const savedSubCat = await newSubCat.save();
       subCategoryId = savedSubCat._id;
     } else {
-      const existingSubCat = await SubCategory.findOne({ name: subCategory });
+      const existingSubCat = await SubCategory.findOne({
+        name: subCategory,
+        mainCategoryId,
+      });
       if (!existingSubCat) {
         return res.status(400).json({ message: "Subcategory not found" });
       }
-
       subCategoryId = existingSubCat._id;
     }
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, "0");
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const yyyy = today.getFullYear();
-    const formattedDate = `${mm}-${dd}-${yyyy}`;
+    const date = new Date();
 
     const newSubCategoryItem = new SubCategoryItem({
       jobTitle,
       subCategoryId,
-      date: formattedDate,
+      date,
       description: description,
     });
     await newSubCategoryItem.save();
-    res.status(201).json({ msg: "Sub-category item added successfully" });
+    res.status(201).json({ message: "Sub-category item added successfully" });
   } catch (error) {
     next(error);
   }
@@ -291,12 +273,24 @@ export const getSubCategoryItems = async (
   next: NextFunction
 ) => {
   try {
-    const subCategoryItems = await SubCategoryItem.find().populate('subCategoryId', 'name');
+    const subCategoryItems = await SubCategoryItem.find().populate(
+      "subCategoryId",
+      "name"
+    );
     if (!subCategoryItems || subCategoryItems.length === 0) {
       return res.status(404).json({ msg: "No subcategory data found" });
     }
-    return res.status(200).json({ msg: "Subcategory items fetched successfully", subCategoryItems });
+    return res.status(200).json({
+      msg: "Subcategory items fetched successfully",
+      subCategoryItems,
+    });
   } catch (error) {
     next(error);
   }
 };
+
+// export const getNewJobRequest = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {};

@@ -3,7 +3,7 @@ export interface SuccessResponse{
     accessToken:string;
     signup?:boolean,
     loginMail?:boolean,
-    loginSuccess?:true
+    loginSuccess?:boolean
     expiresIn:string;
 }
 

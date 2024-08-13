@@ -1,5 +1,4 @@
-import { CookieOptions } from "express";
-
+import mongoose, { Schema } from 'mongoose';
 export interface SignupClientRequestBody {
     firstName: string;
     lastName: string;
@@ -13,6 +12,7 @@ export interface ResendOtpRequestBody {
   otp: {
     otp: string;
     signup: Pick<SignupClientRequestBody, 'email'>;
+    
   };
   forgotCheckBox:string;
 }
@@ -20,6 +20,8 @@ export interface ResendOtpRequestBody {
 export interface VerifyOtpRequestBody {
   otp: string;
 }
+
+
 
 export type EmailRequestBody = Pick<SignupClientRequestBody, 'email'>;
 
