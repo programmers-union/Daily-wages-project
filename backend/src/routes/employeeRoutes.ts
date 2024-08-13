@@ -1,22 +1,22 @@
-import {Router} from 'express';
-import {signupEmployee,verifyOtp,resendOtp,loginMailCheck,loginEmployee} from "../controllers/employeeController"
-import { validateEmployerSignup } from '../middlewares/validationMiddleware';
-const employeeRouter=Router();
-import multer from 'multer';
-const storage=multer.memoryStorage();
-const upload=multer({storage:storage});
+import { Router } from "express";
+import {
+  signupEmployee,
+  resendOtpEmployee,
+  loginMailCheck,
+  loginEmployee,
+  employeeForgotPassword,
+  employeeChangePassword,
+  verifyOtpEmployee,
+} from "../controllers/employeeController";
+import { validateEmployerSignup } from "../middlewares/validationMiddleware";
+const employeeRouter = Router();
 
-
-employeeRouter.post('/signup',validateEmployerSignup,upload.single('photo'),signupEmployee);
-employeeRouter.patch('/verifyOtp',verifyOtp);
-employeeRouter.post('/resendOtp',resendOtp);
-employeeRouter.post('/loginMailCheck',loginMailCheck);
-employeeRouter.post('/login',loginEmployee);
-// employeeRouter.get('forgot-password',forgotPassword);
-
-
-
+employeeRouter.post("/signup", validateEmployerSignup, signupEmployee);
+employeeRouter.patch("/verify-otp", verifyOtpEmployee);
+employeeRouter.post("/resend-otp", resendOtpEmployee);
+employeeRouter.get("/login-mail-check", loginMailCheck);
+employeeRouter.post("/login", loginEmployee);
+employeeRouter.get("/forgot-password", employeeForgotPassword);
+employeeRouter.patch("/change-password", employeeChangePassword);
 
 export default employeeRouter;
-
-

@@ -11,8 +11,6 @@ const CategorySchema:Schema=new Schema({
 
 })
 
-
-
 const Category=mongoose.model<ICategory>('category',CategorySchema);
 
 export default Category;

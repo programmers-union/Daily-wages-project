@@ -1,26 +1,20 @@
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
 import Client from "../models/Client";
-import { generateOtp, sendOtpToUser } from "../helpers/otpHelper";
-import { sendOtpViaEmail } from "../services/mailService";
-import {
-  generateRefreshToken,
-  generateAccessToken,
-  verifyToken,
-} from "../helpers/generateToken";
-import bcrypt from "bcryptjs";
-import {
-  SignupClientRequestBody,
-  ResendOtpRequestBody,
-  VerifyOtpRequestBody,
-  EmailRequestBody,
-  LoginRequestBody,
-} from "client/requests";
+import { generateOtp } from "../helpers/otpHelper";
+import { generateAccessToken,  verifyToken,} from "../helpers/generateToken";
+import {SignupClientRequestBody, ResendOtpRequestBody,EmailRequestBody, LoginRequestBody,} from "client/requests";
+import { handleForgotPassword } from "../helpers/forgotPasswordHelper";
+import {handleMailCheck} from "../helpers/loginMailCheckHelper";
 import { ErrorResponse, SuccessResponse } from "client/response";
-import findClosestJobTitle from "../utils/matchTitle";
+import { changePassword } from "../helpers/changePasswordHelper";
+import { handleLogin } from "../helpers/loginHelper";
+import { verifyOtpHelper } from "../helpers/verifyHelper";
+import {handleResendOtp} from "../helpers/resendOtpHelper";
 import JobRequest from "../models/JobRequest";
-import dotenv from "dotenv";
-dotenv.config();
+import findClosestJobTitle from "../utils/matchTitle";
+import { genSaltSync, hashSync } from "bcryptjs";
+
 
 export const signupClient = async (
   req: Request<{}, {}, SignupClientRequestBody>,
@@ -33,7 +27,7 @@ export const signupClient = async (
       .status(400)
       .json({ msg: "Validation failed", errors: errors.array() });
   }
-  // console.log(req.body);
+  
   const { firstName, lastName, email, password, phoneNumber } = req.body;
 
   try {
@@ -46,17 +40,17 @@ export const signupClient = async (
     }
 
     const otp = generateOtp();
-    console.log("otppp:", otp);
+    console.log("otp:",otp);
     const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const salt = genSaltSync(10);
+    const hash = hashSync(password, salt);
 
     const newClient = new Client({
       firstName,
       lastName,
       email,
-      password: hashedPassword,
+      password: hash,
       phoneNumber,
       otp,
       otpExpiry,
@@ -64,7 +58,7 @@ export const signupClient = async (
 
     await newClient.save();
 
-    await sendOtpToUser(phoneNumber, otp);
+    // await sendOtpToUser(phoneNumber, otp);
 
     res.status(201).json({ msg: "OTP send for verification" });
   } catch (err: any) {
@@ -72,80 +66,27 @@ export const signupClient = async (
   }
 };
 
-export const verifyOtp = async (
-  req: Request<{}, {}, ResendOtpRequestBody>,
-  res: Response<SuccessResponse | ErrorResponse>,
+
+export const verifyOtpClient = async (
+  req: Request<{}, {}, { otp: string }>,
+  res: Response,
   next: NextFunction
 ) => {
-  const { otp } = req.body.otp;
-
-  try {
-    const client = await Client.findOne({ otp });
-    console.log("client:", client);
-    if (!client) {
-      return res
-        .status(404)
-        .json({ msg: "Client not found with the provided OTP" });
-    }
-    if (client.otp !== otp) {
-      return res.status(400).json({ msg: "Invalid OTP" });
-    }
-    const currentTime = new Date();
-    if (client.otpExpiry && client.otpExpiry < currentTime) {
-      return res.status(400).json({ msg: "OTP has expired" });
-    }
-    client.otp = undefined;
-    client.isVerified = true;
-
-    const { accessToken, expiresIn } = generateAccessToken(String(client._id));
-    const refreshToken = generateRefreshToken(String(client._id));
-    client.refreshToken = refreshToken;
-    await client.save();
-
-    res.cookie("jwtRefreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
-      path: "/",
-    });
-
-    res.status(200).json({
-      msg: "OTP verified successfully",
-      otpVerified: true,
-      accessToken: accessToken,
-      expiresIn: expiresIn,
-    });
-  } catch (error) {
-    next(error);
-  }
+  const { otp } = req.body;
+  await verifyOtpHelper(otp, Client as any, res, next);
 };
 
-export const resendOtp = async (
+
+export const resendOtpClient = async (
   req: Request<{}, {}, ResendOtpRequestBody>,
   res: Response<SuccessResponse | ErrorResponse>,
   next: NextFunction
 ) => {
-  console.log("one");
   const email = req.body.otp.signup;
-  console.log(email, "emil");
-  try {
-    const client = await Client.findOne({ email });
-    console.log(client, "clie");
-    if (!client) {
-      return res.status(404).json({ msg: "Client not found" });
-    }
-    const otp = generateOtp();
-    const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
-    client.otp = otp;
-    client.otpExpiry = otpExpiry;
-    await client.save();
-    await sendOtpToUser(client.phoneNumber as string, otp);
-    res.status(200).json({ msg: "OTP resent successfully" });
-  } catch (error) {
-    next(error);
-  }
+  await handleResendOtp(email as any,Client as any,res,next);
+ 
 };
+
 
 export const loginMailCheck = async (
   req: Request<{}, {}, EmailRequestBody>,
@@ -153,28 +94,16 @@ export const loginMailCheck = async (
   next: NextFunction
 ) => {
   const { loginData } = req.query;
-
   let parsedLoginData: { email?: string };
   try {
     parsedLoginData = JSON.parse(loginData as string);
   } catch (error) {
-    return res.status(400).json({ msg: "Invalid loginData format", error });
+    return res.status(400).json({ msg: "Invalid loginData", error});
   }
-
   const { email } = parsedLoginData;
-  try {
-    const client = await Client.findOne({ email });
-    if (!client) {
-      return res.status(401).json({ msg: "please do signup", signup: false });
-    }
-    return res.status(200).json({
-      msg: "have account with this email please enter password",
-      loginMail: true,
-    });
-  } catch (error) {
-    next(error);
-  }
+  await handleMailCheck(email as string, Client as any,res,next);
 };
+
 
 export const loginClient = async (
   req: Request<{}, {}, LoginRequestBody>,
@@ -182,125 +111,64 @@ export const loginClient = async (
   next: NextFunction
 ) => {
   const { email, password } = req.body;
-
-  try {
-    const client = await Client.findOne({ email });
-    if (!client) {
-      return res
-        .status(401)
-        .json({ msg: "there is no account with this email need to signup" });
-    }
-    const isMatch = await bcrypt.compare(password, client.password);
-    if (!isMatch) {
-      return res.status(400).json({ msg: "invalid credentials" });
-    }
-    const token = generateAccessToken(String(client._id));
-    res.cookie("jwt", token, { httpOnly: true, maxAge: 3600000 });
-
-    return res
-      .status(200)
-      .json({ msg: "Login Successful", loginSuccess: true });
-  } catch (error) {
-    next(error);
-  }
+  await handleLogin(email, password, Client as any, res, next);
 };
 
-export const forgotPassword = async (
-  req: Request<{}, {}, {}, { forgotPassword: string; forgotCheckBox: string }>,
+
+export const clientForgotPassword = async (
+  req: Request<{}, {}, {}, { forgotPassword: string }>,
   res: Response<{ msg: string; signUp?: boolean }>,
   next: NextFunction
 ) => {
-  console.log("first");
-  const { forgotPassword, forgotCheckBox } = req.query;
-  console.log(forgotCheckBox, "90");
-  console.log(forgotCheckBox, "100");
-  try {
-    if (!forgotPassword) {
-      return res.status(400).json({ msg: "Identifier is required" });
-    }
-    const identifier = forgotPassword as string;
-    const isEmail = identifier.includes("@");
-    let client;
-
-    if (isEmail) {
-      client = await Client.findOne({ email: identifier });
-    } else {
-      client = await Client.findOne({ phoneNumber: identifier });
-    }
-
-    if (!client) {
-      return res.status(401).json({ msg: "Please sign up", signUp: true });
-    }
-
-    const otp = generateOtp();
-    const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
-    client.otp = otp;
-    client.otpExpiry = otpExpiry;
-    await client.save();
-
-    if (forgotCheckBox === "1") {
-      await sendOtpViaEmail(client.email, otp);
-    } else {
-      await sendOtpToUser(client.phoneNumber, otp);
-    }
-
-    return res.status(200).json({ msg: "OTP sent successfully" });
-  } catch (error) {
-    next(error);
-  }
+  const { forgotPassword } = req.query;
+  await handleForgotPassword(forgotPassword, Client as any, res, next);
 };
 
-export const changePassword = async (
+
+export const clientChangePassword = async (
   req: Request<{}, {}, { newPassword: string; email: string }>,
   res: Response<{ msg: string; changed?: boolean }>,
   next: NextFunction
 ) => {
   const { newPassword, email } = req.body;
-
-  try {
-    const client = await Client.findOne({ email });
-    if (!client) {
-      return res.status(404).json({ msg: "Client not found" });
-    }
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-    client.password = hashedPassword;
-    await client.save();
-    res
-      .status(200)
-      .json({ msg: "passsword changed successfully", changed: true });
-  } catch (error) {
-    next(error);
-  }
+  await changePassword(newPassword, email, res, next, Client as any);
 };
+
+
+
 
 export const refreshToken = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  console.log('toen is success')
+  console.log("here");
   const refreshToken = req.cookies.jwtRefreshToken;
-  console.log(refreshToken,'.....')
+  console.log("refreshToken:", refreshToken);
 
   if (!refreshToken) {
     return res.status(401).json({ message: "Refresh token required" });
   }
 
   const secret = process.env.REFRESH_TOKEN_SECRET;
+  console.log("REFRESH_TOKEN_SECRET:", secret);
+
   if (!secret) {
     return res
       .status(500)
       .json({ message: "Server configuration error. No secret defined." });
   }
 
-  try {
-    const payload = verifyToken(refreshToken, secret);
-    if (!payload || typeof payload !== "object" || !("userId" in payload)) {
-      return res.status(403).json({ message: "Invalid refresh token" });
-    }
+  const payload = verifyToken(refreshToken, secret);
+  console.log("payload:", payload);
 
+  if (!payload || typeof payload !== "object" || !("userId" in payload)) {
+    return res.status(403).json({ message: "Invalid refresh token" });
+  }
+
+  try {
     const client = await Client.findById(payload.userId);
+    console.log("client:", client);
 
     if (!client || client.refreshToken !== refreshToken) {
       return res.status(403).json({ message: "Invalid refresh token" });
@@ -309,8 +177,7 @@ export const refreshToken = async (
     const newAccessToken = generateAccessToken(client._id);
     return res.json({ accessToken: newAccessToken });
   } catch (error) {
-    console.error("Error in refreshToken:", error);
-    return res.status(403).json({ message: "Invalid refresh token" });
+    next(error);
   }
 };
 
@@ -320,39 +187,38 @@ export const handleJobRequest = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log(req.body,'...body....')
   try {
-    console.log(req.body,'...body....')
-    const { jobTitle, date, time, description, location } = req.body;
     const userId=(req as any).userId;
+    const { jobTitle, date, time, description, location } = req.body;
+
     const dateOnly = new Date(date);
     if (isNaN(dateOnly.getTime())) {
       return res.status(400).json({ msg: "Invalid date format" });
     }
 
-    // Find closest job title
+    
     const closestItem = await findClosestJobTitle(jobTitle);
     if (!closestItem) {
       return res.status(404).json({ msg: "No matching job title found" });
     }
-    // Create and save new job request
     const newJobRequest = new JobRequest({
       jobTitle: closestItem._id,
       date: dateOnly,
       time,
       description,
       location,
-      userId:userId
+      userId
     });
 
     await newJobRequest.save();
-    console.log("saved successfully");
     return res.status(201).json({ msg: "Job request added successfully" });
   } catch (error) {
-    console.error("Error in handleJobRequest:", error);
+    console.error('Error in handleJobRequest:', error);
     next(error);
   }
 };
+
+
 
 export const getjobDataForCalender = async (
   req: Request,
@@ -383,3 +249,45 @@ export const getjobDataForCalender = async (
     next(error);
   }
 };
+
+
+export const editCalenderData=async(
+  req:Request,
+  res:Response,
+  next:NextFunction
+)=>{
+  const {jobRequestId}=req.query;
+  const updateData=req.body;
+  console.log("updateData:",updateData);
+  try {
+    const updateJob=await JobRequest.findByIdAndUpdate(jobRequestId,updateData,{new:true});
+    console.log("updateJob:",updateJob);
+    if(!updateJob){
+      return res.status(404).json({msg:"Job not found"});
+    }
+    return res.status(200).json({msg:"Updated job successfully"});
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+export const deleteCalenderData=async(
+  req:Request,
+  res:Response,
+  next:NextFunction
+)=>{
+  const {jobRequestId}=req.query;
+  if(!jobRequestId){
+    return res.status(400).json({msg:"id requierd"});
+  }
+  try {
+    const deleteJobRequest=await JobRequest.findByIdAndDelete({_id:jobRequestId});
+    if (!deleteJobRequest) {
+      return res.status(404).json({ message: 'Job request not found' });
+    }
+    return res.status(200).json({ message: 'Job request deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+}
