@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
 import Client from "../models/Client";
-import { generateOtp } from "../helpers/otpHelper";
+import { generateOtp, sendOtpToUser } from "../helpers/otpHelper";
 import { generateAccessToken,  verifyToken,} from "../helpers/generateToken";
 import {SignupClientRequestBody, ResendOtpRequestBody,EmailRequestBody, LoginRequestBody,} from "client/requests";
 import { handleForgotPassword } from "../helpers/forgotPasswordHelper";
@@ -58,7 +58,7 @@ export const signupClient = async (
 
     await newClient.save();
 
-    // await sendOtpToUser(phoneNumber, otp);
+    await sendOtpToUser(phoneNumber, otp);
 
     res.status(201).json({ msg: "OTP send for verification" });
   } catch (err: any) {
@@ -72,67 +72,70 @@ export const verifyOtpClient = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { otp } = req.body;
+  const  otp  = req.body.otp;
+  console.log("otppppp:",otp);
   await verifyOtpHelper(otp, Client as any, res, next);
 };
 
 
-export const resendOtpClient = async (
-  req: Request<{}, {}, ResendOtpRequestBody>,
-  res: Response<SuccessResponse | ErrorResponse>,
-  next: NextFunction
-) => {
-  const email = req.body.otp.signup;
-  await handleResendOtp(email as any,Client as any,res,next);
+// export const resendOtpClient = async (
+//   req: Request<{}, {}, ResendOtpRequestBody>,
+//   res: Response<SuccessResponse | ErrorResponse>,
+//   next: NextFunction
+// ) => {
+//   console.log(req.body,'----body---')
+//   const email = req.body.otp.signup;
+//   console.log("email:",email)
+//   await handleResendOtp(email as any,Client as any,res,next);
  
-};
+// };
+
+// export const loginMailCheck = async (
+//   req: Request<{}, {}, EmailRequestBody>,
+//   res: Response<SuccessResponse | ErrorResponse>,
+//   next: NextFunction
+// ) => {
+//   const { loginData } = req.query;
+//   let parsedLoginData: { email?: string };
+//   try {
+//     parsedLoginData = JSON.parse(loginData as string);
+//   } catch (error) {
+//     return res.status(400).json({ msg: "Invalid loginData", error});
+//   }
+//   const { email } = parsedLoginData;
+//   await handleMailCheck(email as string, Client as any,res,next);
+// };
 
 
-export const loginMailCheck = async (
-  req: Request<{}, {}, EmailRequestBody>,
-  res: Response<SuccessResponse | ErrorResponse>,
-  next: NextFunction
-) => {
-  const { loginData } = req.query;
-  let parsedLoginData: { email?: string };
-  try {
-    parsedLoginData = JSON.parse(loginData as string);
-  } catch (error) {
-    return res.status(400).json({ msg: "Invalid loginData", error});
-  }
-  const { email } = parsedLoginData;
-  await handleMailCheck(email as string, Client as any,res,next);
-};
+// export const loginClient = async (
+//   req: Request<{}, {}, LoginRequestBody>,
+//   res: Response<SuccessResponse | ErrorResponse>,
+//   next: NextFunction
+// ) => {
+//   const { email, password } = req.body;
+//   await handleLogin(email, password, Client as any, res, next);
+// };
 
 
-export const loginClient = async (
-  req: Request<{}, {}, LoginRequestBody>,
-  res: Response<SuccessResponse | ErrorResponse>,
-  next: NextFunction
-) => {
-  const { email, password } = req.body;
-  await handleLogin(email, password, Client as any, res, next);
-};
+// export const clientForgotPassword = async (
+//   req: Request<{}, {}, {}, { forgotPassword: string }>,
+//   res: Response<{ msg: string; signUp?: boolean }>,
+//   next: NextFunction
+// ) => {
+//   const { forgotPassword } = req.query;
+//   await handleForgotPassword(forgotPassword, Client as any, res, next);
+// };
 
 
-export const clientForgotPassword = async (
-  req: Request<{}, {}, {}, { forgotPassword: string }>,
-  res: Response<{ msg: string; signUp?: boolean }>,
-  next: NextFunction
-) => {
-  const { forgotPassword } = req.query;
-  await handleForgotPassword(forgotPassword, Client as any, res, next);
-};
-
-
-export const clientChangePassword = async (
-  req: Request<{}, {}, { newPassword: string; email: string }>,
-  res: Response<{ msg: string; changed?: boolean }>,
-  next: NextFunction
-) => {
-  const { newPassword, email } = req.body;
-  await changePassword(newPassword, email, res, next, Client as any);
-};
+// export const clientChangePassword = async (
+//   req: Request<{}, {}, { newPassword: string; email: string }>,
+//   res: Response<{ msg: string; changed?: boolean }>,
+//   next: NextFunction
+// ) => {
+//   console.log(req.body,'body body body')
+//   const { newPassword, email } = req.body;
+//   await changePassword(newPassword, email, res, next, Client as any);
+// };
 
 
 
@@ -187,6 +190,7 @@ export const handleJobRequest = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log(req.body)
   try {
     const userId=(req as any).userId;
     const { jobTitle, date, time, description, location } = req.body;
@@ -227,7 +231,6 @@ export const getjobDataForCalender = async (
 ) => {
   try {
     const userId = (req as any).userId;
-    console.log("userId", userId);
 
     if (!userId) {
       return res.status(403).send("User not authenticated");
@@ -291,3 +294,4 @@ export const deleteCalenderData=async(
     next(error);
   }
 }
+

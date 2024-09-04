@@ -1,23 +1,51 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { FormProgressProps } from "../../../types/AdminGategoryType";
 import { WorkerFormStateType } from '../../../types/WorkerTypes';
 import WorkerFormContext from '../../../context/modules/WorkerFormData';
 
 const Form03: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
+    const { formDataWorker, setFormDataWorker } = useContext(WorkerFormContext) as WorkerFormStateType;
 
-    const { formDataWorker, setFormDataWorker } = useContext(WorkerFormContext) as WorkerFormStateType
+    const [errors, setErrors] = useState({
+        skills: '',
+        qualification: '',
+        experience: '',
+        skillLevel: '',
+    });
+
+    const validate = () => {
+        const newErrors = {
+            skills: formDataWorker.skills.trim() === '' ? 'Skills are required' : '',
+            qualification: formDataWorker.qualification.trim() === '' ? 'Qualification is required' : '',
+            experience: formDataWorker.experience.trim() === '' ? 'Experience is required' : '',
+            skillLevel: formDataWorker.skillLevel.trim() === '' ? 'Skill level is required' : '',
+        };
+
+        setErrors(newErrors);
+
+        return Object.values(newErrors).every((error) => error === '');
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
         setFormDataWorker(prevState => ({
             ...prevState,
-            [id]: value
+            [id]: value,
+        }));
+
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [id]: '',
         }));
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log('Form Submitted:', formDataWorker);
-        nextStep();
+        if (validate()) {
+            console.log(formDataWorker,'....formDataWorker....')
+            setFormDataWorker(formDataWorker)
+            nextStep();
+        }
     };
 
     return (
@@ -35,18 +63,23 @@ const Form03: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                                     aria-label="skills"
                                     type="text"
                                     id="skills"
-                                    className="text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] rounded-full"
+                                    className={`text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] bg-transparent ${
+                                        errors.skills ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                     required
                                     value={formDataWorker.skills}
                                     onChange={handleChange}
                                 />
+                                {errors.skills && <p className="text-red-500 text-xs mt-1">{errors.skills}</p>}
                             </div>
                             <div className="mb-4 w-1/2">
                                 <label htmlFor="qualification" className="text-xs">Qualification</label>
                                 <select
                                     aria-label="qualification"
                                     id="qualification"
-                                    className="text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] rounded-full"
+                                    className={`text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] bg-transparent ${
+                                        errors.qualification ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                     required
                                     value={formDataWorker.qualification}
                                     onChange={handleChange}
@@ -57,6 +90,7 @@ const Form03: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                                     <option value="degree">Degree or equivalent</option>
                                     <option value="postGraduation">Post Graduation</option>
                                 </select>
+                                {errors.qualification && <p className="text-red-500 text-xs mt-1">{errors.qualification}</p>}
                             </div>
                         </div>
                         <div className="flex space-x-5">
@@ -65,7 +99,9 @@ const Form03: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                                 <select
                                     aria-label="experience"
                                     id="experience"
-                                    className="text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] rounded-full"
+                                    className={`text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] bg-transparent ${
+                                        errors.experience ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                     required
                                     value={formDataWorker.experience}
                                     onChange={handleChange}
@@ -76,13 +112,16 @@ const Form03: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                                     <option value="2-5 years">2-5 years</option>
                                     <option value="5+ years">5+ years</option>
                                 </select>
+                                {errors.experience && <p className="text-red-500 text-xs mt-1">{errors.experience}</p>}
                             </div>
                             <div className="mb-4 w-1/2">
                                 <label htmlFor="skillLevel" className="text-xs">Skill level</label>
                                 <select
                                     aria-label="skillLevel"
                                     id="skillLevel"
-                                    className="text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] rounded-full"
+                                    className={`text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] bg-transparent ${
+                                        errors.skillLevel ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                     required
                                     value={formDataWorker.skillLevel}
                                     onChange={handleChange}
@@ -93,6 +132,7 @@ const Form03: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                                     <option value="professional">Professional</option>
                                     <option value="expert">Expert</option>
                                 </select>
+                                {errors.skillLevel && <p className="text-red-500 text-xs mt-1">{errors.skillLevel}</p>}
                             </div>
                         </div>
                         <div className="flex space-x-8">

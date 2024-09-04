@@ -1,21 +1,27 @@
-import React, { createContext, FC, ReactNode, useMemo } from "react";
-import { ClientAddFormData, ClientForm } from "../../types/ClientFormType";
+import React, { createContext, FC, ReactNode } from "react";
+import { ClientAddFormData } from "../../types/ClientFormType";
 import axios from "axios";
 import { axiosInterceptorPage } from "./Interceptor";
+
+// Define the interface for the context value
+interface ClientContextType {
+  ClientCalendarAddForm: (formData: ClientAddFormData) => Promise<void>;
+}
 
 interface ClientProviderProps {
   children: ReactNode;
 }
 
-const ClientContext = createContext<ClientForm | null>(null);
+// Initialize context with a default value or null
+const ClientContext = createContext<ClientContextType | null>(null);
 
 export const ClientProvider: FC<ClientProviderProps> = ({ children }) => {
-  const axiosInstance = useMemo(() => axiosInterceptorPage(), []);
-
   const ClientCalendarAddForm = async (formData: ClientAddFormData) => {
+    const axiosInstance = axiosInterceptorPage();
+  console.log(formData,'formdata,...')
     try {
       const response = await axiosInstance.post(
-        "/api/client/client-job-request",
+        "http://localhost:5000/api/client/client-job-request",
         formData,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -26,10 +32,10 @@ export const ClientProvider: FC<ClientProviderProps> = ({ children }) => {
           "Error adding job request:",
           error.response?.data?.message
         );
-        throw error.response?.data?.message || "Error adding job request";
+        throw new Error(error.response?.data?.message || "Error adding job request");
       } else {
         console.error("An unexpected error occurred:", error);
-        throw "An unexpected error occurred";
+        throw new Error("An unexpected error occurred");
       }
     }
   };

@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }: ChildrenNode) => {
   const [signupForm, setSignupForm] = useState<FormData | null>(null);
   const [loginEmailTrue, setLoginEmailTrue] = useState<string | undefined>();
   const [singleEmail , setSingleEmail] = useState<string>('');
+  const [ isCheckLoginClientOrEmployee, setIsCheckLoginClientOrEmployee] = useState<boolean | undefined>(false)
 
   const navigate = useNavigate();
 
@@ -34,6 +35,7 @@ export const AuthProvider = ({ children }: ChildrenNode) => {
           formData
         );
         setSingleEmail(formData.email)
+        console.log(singleEmail,'this is single email data')
         console.log("Sign-up process started", response.data);
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -52,7 +54,7 @@ export const AuthProvider = ({ children }: ChildrenNode) => {
   const EmailLogin = async (loginData: EmailData) => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/client/loginMailCheck",{
+        "http://localhost:5000/api/common/login-mail-check",{
         params: { loginData: JSON.stringify(loginData) },
       });
       setSingleEmail(loginData.email); 
@@ -72,11 +74,15 @@ export const AuthProvider = ({ children }: ChildrenNode) => {
     if (loginData.email.trim() && loginData.password.trim() !== "") {
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/client/login",
-          loginData
+          "http://localhost:5000/api/common/login",
+          loginData,{
+            withCredentials: true,
+          }
         );
         console.log("Login process started", response.data);
-        navigate("/home");
+        localStorage.setItem("accessToken",response.data.accesstoken)
+        setIsCheckLoginClientOrEmployee(response.data.isCheck)
+          navigate("/home");
       } catch (error) {
         if (axios.isAxiosError(error)) {
           console.error("login failed:", error.response?.data?.message);
@@ -93,7 +99,7 @@ export const AuthProvider = ({ children }: ChildrenNode) => {
 
   return (
     <AuthContext.Provider
-      value={{ SignUp, EmailLogin, Login, signupForm, loginEmailTrue , singleEmail }}
+      value={{ SignUp, EmailLogin, Login, signupForm, loginEmailTrue , singleEmail ,isCheckLoginClientOrEmployee }}
     >
       {children}
     </AuthContext.Provider>

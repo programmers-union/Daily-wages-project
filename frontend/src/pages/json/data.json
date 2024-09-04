@@ -1,0 +1,29 @@
+
+
+{ 
+   "dashBoardSideBarData":{
+    "mainSideBarData": [
+        "Dashboard",
+        "Reports",
+        "Charts",
+        "Products",
+        "Category",
+        "Inbox",
+        "Settings"
+    ],
+    "clientSideBarData":[
+        "ClientList",
+        "Orders",
+        "Products",
+        "Calendar",
+        "Settings"
+    ],
+    "workerSideBarData":[
+        "WorkerList",
+        "Orders",
+        "Products",
+        "Calendar",
+        "Settings"
+    ]
+   }
+}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "../header/LandingNavBar";
+// import Navbar from "../header/LandingNavBar";
 import { Link } from "react-router-dom";
 
 const Banner: React.FC = () => {
@@ -17,7 +17,7 @@ const Banner: React.FC = () => {
   return (
     <>
       <div className="bg-custom-gradient h-screen">
-       <Navbar />
+       {/* <Navbar /> */}
         <div className="h-[80vh] flex justify-center items-center ">
           <div className="text-center flex flex-col items-center">
             <h1 className="px-4 py-1 rounded-lg cursor-pointer text-slate-800 text-[78px] font-light -tracking-[0.3rem]">

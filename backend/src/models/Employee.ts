@@ -1,6 +1,8 @@
 import mongoose,{Schema,Document} from "mongoose";
 import { IUser } from "./Client";
 
+
+
 export interface IEmployee extends IUser {
     firstName: string;
     lastName: string;

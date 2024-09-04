@@ -18,6 +18,7 @@ export interface AuthContextProps {
   signupForm: FormData | null ;
   loginEmailTrue: string | boolean | undefined ;
   singleEmail:string
+  isCheckLoginClientOrEmployee: boolean | undefined ;
 }
 
 export interface ChildrenNode {

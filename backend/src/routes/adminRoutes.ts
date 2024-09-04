@@ -8,6 +8,7 @@ import {
   getEmployeesData,
   addSubCategoryItems,
   getSubCategoryItems,
+  getEmployeeData,
 } from "../controllers/adminController";
 const adminRouter = Router();
 import multer from "multer";
@@ -27,5 +28,6 @@ adminRouter.post(
 adminRouter.get('/get-sub-category-items',getSubCategoryItems);
 adminRouter.get("/get-clients", getClientsData);
 adminRouter.get("/get-employees", getEmployeesData);
+adminRouter.get("/get-employee-data",getEmployeeData);
 
 export default adminRouter;

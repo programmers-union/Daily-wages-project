@@ -11,6 +11,7 @@ import authRoutes from './routes/authRoutes';
 import './config/googleAuthConfig';
 import { errorHandler } from './middlewares/errorMiddleware';
 import cors from 'cors';
+import commonRouter from './routes/commonRouter';
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.use('/api/client', clientRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/employee', employeeRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/common',commonRouter)
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

@@ -14,7 +14,7 @@ const Home: React.FC = () => {
   `;
   return (
     <div className="bg-custom-gradient ">
-      <HomeNavBar />
+      {/* <HomeNavBar /> */}
       <MainSection>
         <SubSection>
           <Banner />

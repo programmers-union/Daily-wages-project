@@ -1,10 +1,11 @@
 export interface SuccessResponse{
     msg:string,
-    accessToken:string;
+    accesstoken:string;
     signup?:boolean,
     loginMail?:boolean,
     loginSuccess?:boolean
-    expiresIn:string;
+    expiresin:string;
+    isCheck:boolean;
 }
 
 export interface ErrorResponse{

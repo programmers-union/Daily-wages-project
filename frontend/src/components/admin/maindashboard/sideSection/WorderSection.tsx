@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 
-const WorkerSection: React.FC = () => {
+interface MyCoomponent {
+    slideBarClickHandler: (i: number, category: string) => void;
+    dashboardData:{
+        workerSideBarData:string[]
+    }
+}
+
+const WorkerSection: React.FC<MyCoomponent> = ({slideBarClickHandler,dashboardData}) => {
     const [isOpen, setIsOpen] = useState(false);
-    const WorkerSide = [
-        'WorkerList',
-        'Orders',
-        'Products',
-        'Calendar',
-        'Settings'
-    ];
 
     const handleToggle = () => {
         setIsOpen(!isOpen);
     };
-
+   
     return (
         <div>
             <div
@@ -40,8 +40,8 @@ const WorkerSection: React.FC = () => {
                     isOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
                 }`}
             >
-                {WorkerSide.map((nav, index) => (
-                    <li
+                {dashboardData.workerSideBarData.map((nav, index) => (
+                    <li onClick={()=>slideBarClickHandler(index,'workerSideBarData')}
                         className="flex-grow px-2 py-1 p-[.75rem] hover:text-blue-700 cursor-pointer text-sm text-blue-500 hover:bg-gray-400 rounded-sm"
                         key={index + 6}
                     >

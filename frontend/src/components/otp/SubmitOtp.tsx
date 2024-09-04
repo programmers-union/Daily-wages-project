@@ -4,6 +4,8 @@ import AuthContext from "../../context/modules/AuthContext";
 import { AuthContextProps } from "../../types/authTypes/AuthTypes";
 import { OtpAndSignupType, OtpContextType } from "../../types/Otp";
 import { OtpContext } from "../../context/modules/OtpContext";
+import WorkerFormContext from "../../context/modules/WorkerFormData";
+import { WorkerFormStateType } from "../../types/WorkerTypes";
 
 const OtpPage: React.FC = () => {
   const [otpData, setOtpData] = useState<string[]>(Array(6).fill(""));
@@ -52,13 +54,14 @@ const OtpPage: React.FC = () => {
 
   const { singleEmail } = useContext(AuthContext) as AuthContextProps;
   const { ForgotPasswordOtp } = useContext(OtpContext) as OtpContextType;
+  const { formDataWorker } = useContext(WorkerFormContext) as WorkerFormStateType;
 
-console.log(singleEmail,'single email')
 
   const otpResentHandle = () => {
+    const emailOnlyData = formDataWorker.email || singleEmail
     const otpAndSignup: OtpAndSignupType = {
       otp: "",
-      signup: singleEmail,
+      signup: emailOnlyData,
     };
     OTPReset(otpAndSignup);
     setTimeLeft(20);

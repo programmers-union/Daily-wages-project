@@ -34,6 +34,7 @@ export interface WorkerLoginSecFourProps {
     idProof: string;
     uniqueId: string; 
     idProofFile: File | null;
+    profilePic: File | null;
   }
   
   export interface WorkerFormStateType {
