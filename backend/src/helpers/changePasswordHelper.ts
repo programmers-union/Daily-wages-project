@@ -10,17 +10,20 @@ export const changePassword = async (
     res: Response<{ msg: string; changed?: boolean }>,
     next: NextFunction,
     userModel: Model<IUser>,
+    empl: Model<IUser>,
   ) => {
     try {
       const user = await userModel.findOne({ email });
-      if (!user) {
+      const employee = await empl.findOne({ email });
+      const auther = user || employee
+      if (!auther) {
         return res.status(404).json({ msg: "User not found" });
       }
   
        const salt = genSaltSync(10);
     const hash = hashSync(newPassword, salt);
-      user.password = hash;
-      await user.save();
+    auther.password = hash;
+      await auther.save();
   
       res.status(200).json({ msg: "Password changed successfully", changed: true });
     } catch (error) {

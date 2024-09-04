@@ -3,6 +3,10 @@ import AuthContext from "../../context/modules/AuthContext";
 import { AuthContextProps, EmailData, EmailPasswordData } from '../../types/authTypes/AuthTypes';
 import AuthError from "../../components/error/AuthError";
 import { Link } from "react-router-dom";
+import swal from 'sweetalert'; // Import from 'sweetalert'
+import { OtpContextType } from "../../types/Otp";
+import { OtpContext } from "../../context/modules/OtpContext";
+// import 'sweetalert/dist/sweetalert.css';
 
 
 const Login: React.FC = () => {
@@ -13,8 +17,11 @@ const Login: React.FC = () => {
     email: "",
     password: ""
   });
+  
 
-  const { EmailLogin, Login: contextLogin, loginEmailTrue } = useContext(AuthContext) as AuthContextProps;
+  const { EmailLogin, Login: contextLogin,  loginEmailTrue } = useContext(AuthContext) as AuthContextProps;
+  const { setIsChangePassword } = useContext(OtpContext) as OtpContextType;
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLogFormData((prev) => ({ ...prev, [name]: value }));
@@ -28,8 +35,16 @@ const Login: React.FC = () => {
       // login with email and password
       try {
         await contextLogin(logFormData);
+        // swal("Login Success!", "You have successfully logged in!", "success");
+        swal({
+          title: "Login Success!",
+          text: "You have successfully logged in!",
+          icon: "success", // or "error", "warning", "info"
+          timer: 3000, // automatically close the alert after 3 seconds
+        });
       } catch (error) {
         setError(error as string);
+        swal("Error", "There was a problem with your login.", "error");
       }
     } else {
       // login with email only
@@ -40,6 +55,7 @@ const Login: React.FC = () => {
       }
     }
   };
+
 
   useEffect(() => {
     if (loginEmailTrue) {
@@ -95,19 +111,24 @@ const Login: React.FC = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <Link to='/forgot-password'>
-                <h6 className="text-blue-600 underline text-xs">Forgotten your password?</h6>
+                <h6  onClick={()=>setIsChangePassword(true)} className="text-blue-600 underline text-xs">Forgotten your password?</h6>
                   </Link>
                 {isActive && <AuthError item={error} />}
                 </div>
               </>
             )}
-            <div className="my-6">
+            <div className="mt-6">
               <button
                 type="submit"
                 className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-black"
               >
                 {isActive ? "Submit" : "Continue"}
               </button>
+            </div>
+            <div className="flex justify-between items-center mt-2  underline text-xs ">
+            <Link to="/sign-up" className="hover:text-blue-500" >Create a new Accout</Link>
+            <Link to="/worker-form" className="hover:text-blue-500">Become a daily wager</Link>
+
             </div>
           </form>
           <div className="flex items-center mb-4 w-3/4 m-auto">
@@ -125,7 +146,9 @@ const Login: React.FC = () => {
               Continue with Facebook
             </button>
             <button 
-            onClick={()=> window.location.href = 'http://localhost:5000/api/auth/google'} className="bg-black w-full justify-center text-white text-[12px] helvetic py-2 px-4 rounded flex items-center">
+            onClick={()=>{ window.location.href='http://localhost:5000/api/auth/google',{
+              withCredentials: true,
+            }}} className="bg-black w-full justify-center text-white text-[12px] helvetic py-2 px-4 rounded flex items-center">
               <img
                 src="https://cdn-icons-png.flaticon.com/128/281/281764.png"
                 alt="Google Logo"

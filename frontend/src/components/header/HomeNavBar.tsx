@@ -1,11 +1,13 @@
 import React, {  useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { axiosInterceptorPage } from '../../context/modules/Interceptor';
 
 
 const HomeNavBar:React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
   
+    const navigate = useNavigate()
     const toggleDropdown = () => {
       setIsOpen(!isOpen);
     };
@@ -15,7 +17,20 @@ const HomeNavBar:React.FC = () => {
         setIsOpen(false);
       }
     };
-  
+  const logOutHandle = async ()=>{
+    const axiosInstance = axiosInterceptorPage();
+    setIsOpen(false)
+    try {
+      const response = await axiosInstance.post('http://localhost:5000/api/common/logout')
+      console.log(response,'response')
+      if(response.data.type === true){
+        localStorage.removeItem('accessToken');
+        navigate('/');
+      }
+    } catch (error) {
+      console.log("logout is not success",error)
+    }
+  }
     useEffect(() => {
       document.addEventListener('mousedown', handleClickOutside);
       return () => {
@@ -24,12 +39,12 @@ const HomeNavBar:React.FC = () => {
     }, []);
    
   return (
-    <div>
+    <div className='bg-[#F0F0F0]'>
       <div className="px-5 pt-6 flex justify-between items-center ">
           <p className="font-bold text-[1.5rem]"><span className="text-blue-300">D</span><span className="text-slate-500">W</span></p>
           <ul className="flex items-center gap-6 font-normal text-sm justify-center cursor-pointer ">
             <li>Home</li>
-            <Link to='/worker-calendar'>
+            <Link to='/client-calendar'>
             <li>Calendar</li>
             </Link>
             <li>About</li>
@@ -57,7 +72,7 @@ const HomeNavBar:React.FC = () => {
           aria-labelledby="options-menu"
         >
           <div className="" role="none">
-            <Link to='/worker-profile' >
+            <Link to='/profile' >
             <button
               className="block px-4 border-b  border-gray-300 py-2 text-sm text-gray-700 hover:bg-gray-200 w-full text-left"
               role="menuitem"
@@ -66,6 +81,7 @@ const HomeNavBar:React.FC = () => {
             </button>
             </Link>
             <button
+            onClick={logOutHandle}
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 w-full text-left"
               role="menuitem"
             >

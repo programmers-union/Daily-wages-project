@@ -13,7 +13,7 @@ const WorkerForm: React.FC = () => {
     const [step, setStep] = useState<number>(1);
     const [activeAddCategoryPopup, setActiveAddCategoryPopup] = useState<boolean>(false);
 
-    const steps = ["Form 01", "Form 02", "Form 03", "Form 04", "Sign Up"];
+    const steps = ["Form 01", "Form 02", "Form 03", "Form 04"];
 
     const nextStep = () => {
         setStep(prevStep => prevStep + 1);

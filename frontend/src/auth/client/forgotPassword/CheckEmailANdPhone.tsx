@@ -7,7 +7,7 @@ import { AuthContextProps } from '../../../types/authTypes/AuthTypes';
 import AuthError from '../../../components/error/AuthError';
 
 const CheckEmailAndPhone = () => {
-  const [method, setMethod] = useState<string>('1');
+  const [method, setMethod] = useState<number>(1);
   const [value, setValue] = useState('');
   const [errorHandle , setErrorHandle ] = useState<string>('')
 
@@ -34,7 +34,7 @@ const CheckEmailAndPhone = () => {
   };
 
   const forgotHandle = (e: ChangeEvent<HTMLInputElement>) => {
-    setMethod(e.target.value);
+    setMethod(Number(e.target.value));
     
   };
 
@@ -51,16 +51,16 @@ const CheckEmailAndPhone = () => {
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+          <div className="rounded-md  -space-y-px">
             <div className="flex gap-4 justify-center my-6">
-              <input onChange={forgotHandle} value='1' type="radio" name="eORp" checked={method === '1'} /> Email
-              <input onChange={forgotHandle} value='2' type="radio" name="eORp" checked={method === '2'} /> Phone number
+              <input onChange={forgotHandle} value={1} type="radio" name="eORp" checked={method === 1} /> Email
+              <input onChange={forgotHandle} value={2} type="radio" name="eORp" checked={method === 2} /> Phone number
             </div>
             <div>
               <label htmlFor="reset-value" className="sr-only">
-                {method === '1' ? 'Email address' : 'Phone number'}
+                {method === 1 ? 'Email address' : 'Phone number'}
               </label>
-              {method === '1' ? (
+              {method === 1 ? (
                 <input
                   id="reset-value"
                   name="reset-value"

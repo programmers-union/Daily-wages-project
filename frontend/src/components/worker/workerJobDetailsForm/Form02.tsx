@@ -1,12 +1,32 @@
-import React, { useContext } from 'react';
-import {  WorkerFormStateType } from '../../../types/WorkerTypes';
+import React, { useContext, useState } from 'react';
+import { WorkerFormStateType } from '../../../types/WorkerTypes';
 import WorkerFormContext from '../../../context/modules/WorkerFormData';
 import { FormProgressProps } from '../../../types/AdminGategoryType';
 
-
 const Form02: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
+  const { formDataWorker, setFormDataWorker } = useContext(WorkerFormContext) as WorkerFormStateType;
 
-  const { formDataWorker, setFormDataWorker } = useContext(WorkerFormContext) as WorkerFormStateType
+  const [errors, setErrors] = useState({
+    address: '',
+    selectState: '',
+    selectDistrict: '',
+    selectCity: '',
+    pinCode: '',
+  });
+
+  const validate = () => {
+    const newErrors = {
+      address: formDataWorker.address.trim() === '' ? 'Address is required' : '',
+      selectState: formDataWorker.selectState.trim() === '' ? 'State is required' : '',
+      selectDistrict: formDataWorker.selectDistrict.trim() === '' ? 'District is required' : '',
+      selectCity: formDataWorker.selectCity.trim() === '' ? 'City is required' : '',
+      pinCode: formDataWorker.pinCode.trim() === '' ? 'Pin Code is required' : '',
+    };
+
+    setErrors(newErrors);
+
+    return Object.values(newErrors).every((error) => error === '');
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
@@ -14,11 +34,19 @@ const Form02: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
       ...prevData,
       [id]: value,
     }));
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [id]: '',
+    }));
   };
 
   const handleSubmit = () => {
-    console.log(formDataWorker,'****');
-    nextStep();
+    if (validate()) {
+      console.log(formDataWorker,'....formDataWorker....')
+      setFormDataWorker(formDataWorker)
+      nextStep();
+    }
   };
 
   return (
@@ -38,9 +66,12 @@ const Form02: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                   aria-label="address"
                   type="text"
                   id="address"
-                  className="text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] rounded-full"
+                  className={`text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] bg-transparent ${
+                    errors.address ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   required
                 />
+                {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
               </div>
               <div className="mb-4 w-1/2">
                 <label htmlFor="selectState" className="text-xs">Select State</label>
@@ -49,7 +80,9 @@ const Form02: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                   value={formDataWorker.selectState} 
                   aria-label="select state"
                   id="selectState"
-                  className="text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] rounded-full"
+                  className={`text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] bg-transparent ${
+                    errors.selectState ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   required
                 >
                   <option value="" disabled></option>
@@ -57,6 +90,7 @@ const Form02: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                   <option value="karnataka">Karnataka</option>
                   <option value="tamilnadu">Tamil Nadu</option>
                 </select>
+                {errors.selectState && <p className="text-red-500 text-xs mt-1">{errors.selectState}</p>}
               </div>
             </div>
             <div className="flex space-x-5">
@@ -67,7 +101,9 @@ const Form02: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                   value={formDataWorker.selectDistrict} 
                   aria-label="select district"
                   id="selectDistrict"
-                  className="text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] rounded-full"
+                  className={`text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] bg-transparent ${
+                    errors.selectDistrict ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   required
                 >
                   <option value="" disabled></option>
@@ -75,6 +111,7 @@ const Form02: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                   <option value="Kochi">Kochi</option>
                   <option value="Idukki">Idukki</option>
                 </select>
+                {errors.selectDistrict && <p className="text-red-500 text-xs mt-1">{errors.selectDistrict}</p>}
               </div>
               <div className="mb-4 w-1/3">
                 <label htmlFor="selectCity" className="text-xs">Select City</label>
@@ -83,7 +120,9 @@ const Form02: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                   value={formDataWorker.selectCity} 
                   aria-label="select city"
                   id="selectCity"
-                  className="text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] rounded-full"
+                  className={`text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] bg-transparent ${
+                    errors.selectCity ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   required
                 >
                   <option value="" disabled></option>
@@ -91,6 +130,7 @@ const Form02: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                   <option value="karnataka">Karnataka</option>
                   <option value="tamilnadu">Tamil Nadu</option>
                 </select>
+                {errors.selectCity && <p className="text-red-500 text-xs mt-1">{errors.selectCity}</p>}
               </div>
               <div className="mb-4 w-1/3">
                 <label htmlFor="pinCode" className="text-xs">Pin Code</label>
@@ -99,7 +139,9 @@ const Form02: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                   value={formDataWorker.pinCode} 
                   aria-label="pin code"
                   id="pinCode"
-                  className="text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] rounded-full"
+                  className={`text-xs mt-1 w-full border-b py-2 px-3 outline-none bg-[#f9f9fc] bg-transparent ${
+                    errors.pinCode ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   required
                 >
                   <option value="" disabled></option>
@@ -107,6 +149,7 @@ const Form02: React.FC<FormProgressProps> = ({ nextStep, prevStep }) => {
                   <option value="674332">674332</option>
                   <option value="987346">987346</option>
                 </select>
+                {errors.pinCode && <p className="text-red-500 text-xs mt-1">{errors.pinCode}</p>}
               </div>
             </div>
             <div className="flex space-x-8">

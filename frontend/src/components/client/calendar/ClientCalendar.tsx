@@ -9,6 +9,7 @@ import axios from "axios";
 import { axiosInterceptorPage } from "../../../context/modules/Interceptor";
 import EventPopup from "./EventPopup";
 
+
 const localizer = momentLocalizer(moment);
 
 interface CalendarEvent {
@@ -36,6 +37,8 @@ const ClientCalendar: React.FC = () => {
   };
 
   const { setGetSubCategoriesItemsDatas } = useContext(AdminFormContext) as AdminFormListData;
+  
+
 
   useEffect(() => {
     const axiosInstance = axiosInterceptorPage();
@@ -104,7 +107,7 @@ const ClientCalendar: React.FC = () => {
           events={getCalendarData}
           startAccessor="start"
           endAccessor="end"
-          selectable={true}  // Enable selecting slots
+          selectable={true} 
           onSelectEvent={handleEventClick}
           onSelectSlot={handleSlotClick}
           style={{ height: "90vh", cursor: "pointer",fontSize: "12px" }}

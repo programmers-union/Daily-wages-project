@@ -2,10 +2,14 @@ import React, { useContext, useState } from 'react';
 import { MuiTelInput } from 'mui-tel-input';
 import WorkerFormContext from '../../context/modules/WorkerFormData';
 import { WorkerFormStateType } from '../../types/WorkerTypes';
+import { OtpContextType } from '../../types/Otp';
+import { OtpContext } from '../../context/modules/OtpContext';
 
 const SignUp: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const { formDataWorker, setFormDataWorker, WorkerSignUp } = useContext(WorkerFormContext) as WorkerFormStateType;
+  const { setIsCheckClientOrWorker } = useContext(OtpContext) as OtpContextType;
+  
   const handlePhoneNumberChange = (newPhoneNumber: string) => {
     setPhoneNumber(newPhoneNumber);
     setFormDataWorker((prevData) => ({
@@ -26,6 +30,7 @@ const SignUp: React.FC = () => {
     e.preventDefault();
     try {
        WorkerSignUp(formDataWorker);
+       setIsCheckClientOrWorker(true);
     } catch (error) {
       console.error('Sign up error:', error);
     }

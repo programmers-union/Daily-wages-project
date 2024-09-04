@@ -11,3 +11,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       </BrowserRouter>
     </React.StrictMode>
 );
+
+// hair foil 
+// 500 ponds
+// teel color 
+// xalten robotic site rework 
+// pearldenthel site  

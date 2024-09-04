@@ -7,6 +7,7 @@ export interface IUser extends Document {
     otp?: string;
     otpExpiry?: Date;
     password?:string
+    refreshToken?:string
   }
 
 

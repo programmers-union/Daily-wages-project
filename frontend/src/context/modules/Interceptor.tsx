@@ -4,7 +4,7 @@ export const axiosInterceptorPage = () => {
   const axiosInstance = axios.create({
     baseURL: "http://localhost:5000",
     headers: { "Content-Type": "application/json" },
-    withCredentials: true,
+    withCredentials: true, // Ensure cookies are sent with requests
   });
 
   axiosInstance.interceptors.request.use(
@@ -31,19 +31,20 @@ export const axiosInterceptorPage = () => {
           try {
             const response = await axios.post(
               "http://localhost:5000/api/client/refresh-token",
-              {},
               { withCredentials: true }
             );
             const { accessToken } = response.data;
-            localStorage.setItem("accessToken", accessToken.accessToken);
-            axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-            originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
-            return axiosInstance(originalRequest);
+            if (accessToken) {
+              localStorage.setItem("accessToken", accessToken);
+              axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+              originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+              return axiosInstance(originalRequest);
+            }
           } catch (refreshError) {
             console.error('Refresh token error:', refreshError);
             localStorage.removeItem("accessToken");
-            // Optionally redirect to login page
-            // window.location.href = '/login';
+            // Redirect to login page if refresh fails
+            window.location.href = '/';
             return Promise.reject(refreshError);
           }
         }

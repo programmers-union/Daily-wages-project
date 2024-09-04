@@ -7,6 +7,7 @@ import Employee from "../models/Employee";
 import bcrypt from "bcryptjs";
 import uploadIcon from "../config/cloudinaryConfig";
 import SubCategoryItem from "../models/SubCategoryItems";
+import EmployeeForm from "../models/EmployeeForm";
 
 
 export const signupAdmin = async (
@@ -63,7 +64,6 @@ export const getCategories = async (
     if (!categories) {
       return res.json({ msg: "no categoriess found" });
     }
-    // console.log(categories);
     return res
       .status(200)
       .json({ msg: "categories fetched successfully", categories: categories });
@@ -117,7 +117,6 @@ export const getSubCategories = async (
       acc[item.categoryId] = item.subCategories;
       return acc;
     }, {});
-    console.log("resulttttttttttt:", result);
     res.status(200).json([result]);
   } catch (error) {
     next(error);
@@ -138,7 +137,6 @@ export const addSubCategory = async (
   const formattedDate = `${mm}-${dd}-${yyyy}`;
   try {
     const subCategory = await SubCategory.findOne({ name: name });
-    console.log("subCategory:", subCategory);
     if (subCategory) {
       return res.json({ msg: "already added" });
     }
@@ -147,7 +145,6 @@ export const addSubCategory = async (
 
     if (file) {
       iconUrl = await uploadIcon(file.buffer);
-      console.log("iconUrl:", iconUrl);
     }
 
     const newSubCategory = new SubCategory({
@@ -156,10 +153,9 @@ export const addSubCategory = async (
       iconUrl: iconUrl,
       date: formattedDate,
     });
-    console.log("newSubCategory:", newSubCategory);
+
 
     await newSubCategory.save();
-    console.log("three");
     res.status(201).json({ msg: "Sub-category added successfully" });
   } catch (error) {
     next(error);
@@ -173,7 +169,6 @@ export const getClientsData = async (
 ) => {
   try {
     const clientsData = await Client.find({}, "firstName email phoneNumber");
-    console.log("clientsdata:", clientsData);
     if (!clientsData) {
       return res.status(404).json({ msg: "no clients found" });
     }
@@ -196,7 +191,6 @@ export const getEmployeesData = async (
       {},
       "firstName email phoneNumber"
     );
-    console.log("EmployeesData:", employeesData);
     if (!employeesData) {
       return res.status(404).json({ msg: "no Empolyees found" });
     }
@@ -289,8 +283,17 @@ export const getSubCategoryItems = async (
   }
 };
 
-// export const getNewJobRequest = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {};
+export const getEmployeeData = async (req: Request, res: Response , next:NextFunction) =>{
+  console.log('object')
+  try {
+    const employee = await EmployeeForm.find();
+    console.log(employee,'seeeeee')
+    if (!employee) {
+      return res.status(404).json({ msg: "Employee not found" });
+    }
+   return res.json(employee);
+   
+  } catch (error) {
+   next(error);
+  }
+}

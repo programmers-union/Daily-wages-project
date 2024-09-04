@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 export interface AdminFormData {
   image: File | null;
   subCategory: string;
@@ -11,13 +13,28 @@ export interface FormProgressProps {
   activeAddCategoryPopup: boolean;
   nextStep: () => void;
   prevStep: () => void;
+  setActiveAddCategoryPopup: Dispatch<SetStateAction<boolean>>;
 }
 export interface Item {
   id: string;
   name: string;
   // other properties...
 }
-
+export interface EmployeeData {
+  _id: string;
+  holderName: string;
+  profilePic: string;
+  city: string;
+  rating: number;
+  experience: number;
+  skillLevel: string;
+  totalWork?: number;
+  completedWork?: number;
+  workStatus: string;
+  linkedPhoneNumber: string;
+  email: string;
+  bankAccountDetails: string;
+}
 export interface AdminFormListData {
   AdminFormAdding: (formDataAdmin: AdminFormData) => Promise<void>;
   setMainCategoryId: (id: string) => void;
@@ -28,8 +45,8 @@ export interface AdminFormListData {
   setGetSubCategories: (values: GetSubCategoryAndItems) => void;
   getSubCategoriesItemsDatas: Item[];
   setGetSubCategoriesItemsDatas: (values: Item[]) => void;
+  getEmployeeFullData:EmployeeData[] 
 }
-
 export interface MainCategoryProps {
   setActiveAddCategoryPopup: (active: boolean) => void;
 }

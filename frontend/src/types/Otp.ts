@@ -6,7 +6,11 @@ export interface OtpContextType {
   ForgotPassword: (forgotPassword: string) => Promise<void>;
   ForgotPasswordOtp: (forgotPasswordOtp: OtpAndSignupType) => Promise<void>;
   // ForgotOTPSubmit: (otp: OtpAndSignupType) => Promise<void>;
-  setForgotCheckBox: (forgotCheckBox: string) => void;
+  setForgotCheckBox: (forgotCheckBox: number) => void;
+  setIsChangePassword:(item: boolean) => void;
+  ChangePassword: (changePass: OtpAndSignupType) => void;
+  setIsCheckClientOrWorker:(item: boolean) => void;
+  isCheckClientOrWorker:boolean
 }
 
 export interface ChildrenNode {
@@ -15,9 +19,13 @@ export interface ChildrenNode {
 
 export type OtpAndSignupType = {
   otp: string;
-  signup: string | null;
+  signup: string | null ;
   forgotPasswordOtp?: string;
+  changePass?: string | null;
+  singleEmail?: string | null; 
+  email?: string;
 };
+
 
 export interface ForgotPasswordType {
   ForgotPassword: (forgotPassword: string) => Promise<void>;

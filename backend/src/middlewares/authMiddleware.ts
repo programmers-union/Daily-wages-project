@@ -10,18 +10,19 @@ export const authMiddleware = (
 ) => {
   try{
   const authHeader = req.headers.authorization;
+  console.log(authHeader,'authHeader')
   if (!authHeader) {
     return res.status(401).send("Access denied. No token provided.");
   }
 
   const parts = authHeader.split(" ");
+  console.log(parts,'parts')
   if (parts.length !== 2 || parts[0] !== "Bearer") {
     console.log("Invalid token format");
     return res.status(401).send("Invalid token format.");
   }
 
   const token = parts[1];
-  console.log("token:", token);
 
   const secret = process.env.ACCESS_TOKEN_SECRET;
   if (!secret) {
@@ -43,5 +44,9 @@ export const authMiddleware = (
   }
 };
 
-
 export default authMiddleware;
+
+
+
+
+
