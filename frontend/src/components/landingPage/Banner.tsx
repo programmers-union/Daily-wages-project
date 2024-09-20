@@ -18,8 +18,10 @@ const Banner: React.FC = () => {
     <>
       <div className="bg-custom-gradient h-screen">
        {/* <Navbar /> */}
-        <div className="h-[80vh] flex justify-center items-center ">
-          <div className="text-center flex flex-col items-center">
+        <div className="h-[80vh] flex flex-col justify-center items-center ">
+          <div>
+            
+          <div className="text-center flex flex-col items-center  ">
             <h1 className="px-4 py-1 rounded-lg cursor-pointer text-slate-800 text-[78px] font-light -tracking-[0.3rem]">
               I need someone to
             </h1>
@@ -29,7 +31,7 @@ const Banner: React.FC = () => {
                 {phrases.map((phrase, i) => (
                   <div
                     key={i}
-                    className={`transition-opacity text-slate-800 duration-500 ease-in-out ${
+                    className={`transition-opacity text-slate-800 text-4xl mt-3 duration-500 ease-in-out ${
                       index === i ? "opacity-100" : "opacity-100"
                     }`}
                   >
@@ -40,7 +42,10 @@ const Banner: React.FC = () => {
             </div>
         
           </div>
+          {/* <div  className="h-[0.5px] mt-3 w-[35rem] m-auto bg-black"></div> */}
+          </div>
         </div>
+          
         <div className="px-5 pt-3 flex justify-center items-center  ">
           <Link to='/worker-form' >
           <p className="text-sm px-6 bg-custom-gradient py-2 border-b rounded-full  text-[#3a3a3a] hover:cursor-pointer font-normal ">

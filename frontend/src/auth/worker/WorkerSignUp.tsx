@@ -4,10 +4,11 @@ import WorkerFormContext from '../../context/modules/WorkerFormData';
 import { WorkerFormStateType } from '../../types/WorkerTypes';
 import { OtpContextType } from '../../types/Otp';
 import { OtpContext } from '../../context/modules/OtpContext';
+import Fail from '../../components/faild/Fail';
 
 const SignUp: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
-  const { formDataWorker, setFormDataWorker, WorkerSignUp } = useContext(WorkerFormContext) as WorkerFormStateType;
+  const { formDataWorker, setFormDataWorker, WorkerSignUp , loginError} = useContext(WorkerFormContext) as WorkerFormStateType;
   const { setIsCheckClientOrWorker } = useContext(OtpContext) as OtpContextType;
   
   const handlePhoneNumberChange = (newPhoneNumber: string) => {
@@ -113,6 +114,7 @@ const SignUp: React.FC = () => {
                 Create my account
               </button>
             </div>
+            
           </form>
           <div className="flex items-center mb-4">
             <div className="border-b border-gray-300 w-full"></div>
@@ -139,6 +141,8 @@ const SignUp: React.FC = () => {
           </div>
         </div>
       </div>
+      {loginError.length > 0 && <Fail error={loginError} /> }
+      
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { MuiTelInput } from 'mui-tel-input';
 import AuthContext from '../../context/modules/AuthContext';
 import { AuthContextProps, FormData } from '../../types/authTypes/AuthTypes';
+import Fail from '../../components/faild/Fail';
 
 const SignUp: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
@@ -13,8 +14,7 @@ const SignUp: React.FC = () => {
     phoneNumber: '',
   });
 
-  const { SignUp } = useContext(AuthContext) as AuthContextProps;
-
+  const { SignUp ,signupError } = useContext(AuthContext) as AuthContextProps;
   const handlePhoneNumberChange = (newPhoneNumber: string) => {
     setPhoneNumber(newPhoneNumber);
     setFormData((prevData) => ({
@@ -33,6 +33,7 @@ const SignUp: React.FC = () => {
 
   const handleSubmit =  (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(formData,'---formdata----')
     try {
        SignUp(formData);
     } catch (error) {
@@ -143,6 +144,8 @@ const SignUp: React.FC = () => {
             </div>
         </div>
       </div>
+      {signupError.length > 0 &&  <Fail error={signupError} /> }
+     
     </div>
   );
 };

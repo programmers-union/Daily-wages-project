@@ -3,9 +3,10 @@ import AuthContext from "../../context/modules/AuthContext";
 import { AuthContextProps, EmailData, EmailPasswordData } from '../../types/authTypes/AuthTypes';
 import AuthError from "../../components/error/AuthError";
 import { Link } from "react-router-dom";
-import swal from 'sweetalert'; // Import from 'sweetalert'
+// import swal from 'sweetalert'; // Import from 'sweetalert'
 import { OtpContextType } from "../../types/Otp";
 import { OtpContext } from "../../context/modules/OtpContext";
+import Fail from "../../components/faild/Fail";
 // import 'sweetalert/dist/sweetalert.css';
 
 
@@ -19,7 +20,7 @@ const Login: React.FC = () => {
   });
   
 
-  const { EmailLogin, Login: contextLogin,  loginEmailTrue } = useContext(AuthContext) as AuthContextProps;
+  const { EmailLogin, Login: contextLogin,loginError,  loginEmailTrue } = useContext(AuthContext) as AuthContextProps;
   const { setIsChangePassword } = useContext(OtpContext) as OtpContextType;
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,15 +37,15 @@ const Login: React.FC = () => {
       try {
         await contextLogin(logFormData);
         // swal("Login Success!", "You have successfully logged in!", "success");
-        swal({
-          title: "Login Success!",
-          text: "You have successfully logged in!",
-          icon: "success", // or "error", "warning", "info"
-          timer: 3000, // automatically close the alert after 3 seconds
-        });
+        // swal({
+        //   title: "Login Success!",
+        //   text: "You have successfully logged in!",
+        //   icon: "success", // or "error", "warning", "info"
+        //   timer: 3000, // automatically close the alert after 3 seconds
+        // });
       } catch (error) {
         setError(error as string);
-        swal("Error", "There was a problem with your login.", "error");
+        // swal("Error", "There was a problem with your login.", "error");
       }
     } else {
       // login with email only
@@ -159,6 +160,8 @@ const Login: React.FC = () => {
           </div>
         </div>
       </div>
+      {loginError.length > 0 && <Fail error={loginError} />}
+      
     </div>
   );
 };

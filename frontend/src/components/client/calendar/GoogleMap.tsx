@@ -28,7 +28,7 @@ const GoogleMap: React.FC = () => {
       initMap();
     } else {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDFXRG1d6ydidZAT2iO3pGc-MKVavOnBsM`;
       script.async = true;
       script.defer = true;
       script.onload = initMap;
@@ -36,7 +36,7 @@ const GoogleMap: React.FC = () => {
     }
   }, []);
 
-  return <div ref={mapRef} style={{ height: '50vh', width: '100%' }} />;
+  return <div ref={mapRef} style={{ height: '30vh', width: '100%' }} />;
 };
 
 export default GoogleMap;

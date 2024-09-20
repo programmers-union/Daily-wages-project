@@ -1,13 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Calendar, momentLocalizer, SlotInfo } from "react-big-calendar";
+import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import JobRequestForm from "./JobRequestForm";
+// import JobRequestForm from "./JobRequestForm";
 import AdminFormContext from "../../../context/modules/AdminFormContext";
 import { AdminFormListData } from "../../../types/AdminGategoryType";
 import axios from "axios";
 import {  createAxiosInstance } from "../../../context/modules/Interceptor";
-import EventPopup from "./EventPopup";
+// import EventPopup from "./EventPopup";
+import EventPopup from "../../client/calendar/EventPopup";
 
 
 const localizer = momentLocalizer(moment);
@@ -20,19 +21,28 @@ interface CalendarEvent {
   location: string;
 }
 
-const ClientCalendar: React.FC = () => {
-  const [isActive, setIsActive] = useState<boolean>(false);
-  const [calendarDate, setCalendarDate] = useState<string | null>(null);
+const ClientCalendarDashboard: React.FC = () => {
   const [getCalendarData, setGetCalendarData] = useState<CalendarEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
 
-  const { setGetSubCategoriesItemsDatas } = useContext(AdminFormContext) as AdminFormListData;
+  const handleEventClick = (event: CalendarEvent) => {
+    // alert(`Event clicked: ${event.title} on ${moment(event.start).format('MMMM Do YYYY, h:mm:ss a')}`);
+    setSelectedEvent(event);
+  };
 
-  const axiosInstance = createAxiosInstance();
+  // const handleSlotClick = (slotInfo: SlotInfo) => {
+  //   // setCalendarDate(moment(slotInfo.start).format('MMMM Do YYYY'));
+  // };
+
+  const { setGetSubCategoriesItemsDatas } = useContext(AdminFormContext) as AdminFormListData;
+  
+
+
   useEffect(() => {
     const getCalendarDate = async () => {
       try {
-        const response = await axiosInstance.get('http://localhost:5000/api/client/calender-show-data');
+        const response = await axios.get('http://localhost:5000/api/client/calender-show-data');
+        console.log(response.data, 'response.data');
         if (response.data && Array.isArray(response.data.data)) {
           const formattedData = response.data.data.map((event: any) => {
             const [year, month, day] = event.date.split('T')[0].split('-');
@@ -64,6 +74,7 @@ const ClientCalendar: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const axiosInstance = createAxiosInstance();
     const getMainCategory = async () => {
       try {
         const response = await axiosInstance.get("http://localhost:5000/api/admin/get-sub-category-items");
@@ -78,22 +89,9 @@ const ClientCalendar: React.FC = () => {
       }
     };
     getMainCategory();
-  }, [setGetSubCategoriesItemsDatas,axiosInstance]);
+  }, [setGetSubCategoriesItemsDatas]);
 
-  const handleEventClick = (event: CalendarEvent) => {
-    console.log(event,'&&&&event &&&&')
-    // alert(`Event clicked: ${event.title} on ${moment(event.start).format('MMMM Do YYYY, h:mm:ss a')}`);
-    setSelectedEvent(event);
-  };
-
-  const handleSlotClick = (slotInfo: SlotInfo) => {
-    setCalendarDate(moment(slotInfo.start).format('MMMM Do YYYY'));
-    setIsActive(true);
-  };
-  const handleJobRequestSubmit = () => {
-    // Fetch the latest data after a new job request is submitted
-    getCalendarDate();
-  };
+  console.log(getCalendarData, 'getCalendarData');
 
   return (
     <>
@@ -108,7 +106,7 @@ const ClientCalendar: React.FC = () => {
           endAccessor="end"
           selectable={true} 
           onSelectEvent={handleEventClick}
-          onSelectSlot={handleSlotClick}
+          // onSelectSlot={handleSlotClick}
           style={{ height: "90vh", cursor: "pointer",fontSize: "12px" }}
         />
       </div>
@@ -118,11 +116,11 @@ const ClientCalendar: React.FC = () => {
         onClose={() => setSelectedEvent(null)}
       />
     )}
-      {isActive && (
-        <JobRequestForm calendarDate={calendarDate} setIsActive={setIsActive} onSubmitSuccess={handleJobRequestSubmit} />
-      )}
+      {/* {isActive && (
+        <JobRequestForm calendarDate={calendarDate} setIsActive={setIsActive} />
+      )} */}
     </>
   );
 };
 
-export default ClientCalendar;
+export default ClientCalendarDashboard;

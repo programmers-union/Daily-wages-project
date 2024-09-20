@@ -69,6 +69,7 @@ const Form01: React.FC<FormProgressProps> = ({ nextStep }) => {
                 aria-label="first name"
                 type="text"
                 id="firstName"
+                name='firstName'
                 className={`text-xs mt-1 w-full border-b py-2 border-gray-300 px-3 outline-none bg-transparent ${errors.firstName ? 'border-red-500' : ''}`}
                 required
               />
@@ -82,6 +83,7 @@ const Form01: React.FC<FormProgressProps> = ({ nextStep }) => {
                 aria-label="last name"
                 type="text"
                 id="lastName"
+                name='lastName'
                 className={`text-xs mt-1 w-full border-b py-2 border-gray-300 px-3 outline-none bg-transparent ${errors.lastName ? 'border-red-500' : ''}`}
                 required
               />

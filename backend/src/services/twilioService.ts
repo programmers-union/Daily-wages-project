@@ -10,6 +10,8 @@ const client=twilio(accountSid,authToken);
 
 export const sendOtp=async(mobileNumber:string,otp:string):Promise<void>=>{
     try {
+        console.log("mobileNumber:",mobileNumber);
+        console.log("otp:",otp);
         await client.messages.create({
             body:`Your OTP is ${otp}`,
             to:mobileNumber,
@@ -21,6 +23,9 @@ export const sendOtp=async(mobileNumber:string,otp:string):Promise<void>=>{
         throw new Error('Failed to send OTP');
     }
 };
+
+
+
 
 
 

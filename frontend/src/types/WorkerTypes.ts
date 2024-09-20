@@ -25,21 +25,23 @@ export interface WorkerLoginSecFourProps {
     qualification: string;
     experience: string; 
     skillLevel: string;
-    holderName: string;
-    accoutNumber: string; 
-    bank: string;
-    ifsc: string; 
-    branch: string;
-    linkPhoneNumber: string; 
+    // holderName: string;
+    // accoutNumber: string; 
+    // bank: string;
+    // ifsc: string; 
+    // branch: string;
+    // linkPhoneNumber: string; 
     idProof: string;
     uniqueId: string; 
-    idProofFile: File | null;
-    profilePic: File | null;
+    // idProofFile: File | null;
+    // profilePic: File | null;
   }
   
   export interface WorkerFormStateType {
     formDataWorker: workerFormType;
     setFormDataWorker: React.Dispatch<React.SetStateAction<workerFormType>>;
     WorkerSignUp:(formDataWorker:workerFormType) => Promise<void>;
+    loginError:string;
+    signupSuccess:string;
   }
   

@@ -53,7 +53,7 @@ const WorkerList: React.FC = () => {
                     <div className="flex-shrink-0 h-10 w-10">
                       <img
                         className="h-10 w-10 rounded-full"
-                        src={user.profilePic}
+                        src='https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600'
                         alt={`${user.holderName}'s profile`}
                       />
                     </div>
@@ -90,34 +90,35 @@ const WorkerList: React.FC = () => {
                         : "bg-blue-500 text-white"
                     }`}
                   >
-                    {user.workStatus}
+                    {/* {user.workStatus} */}
+                    No work
                   </span>
                 </td>
               </tr>
               {expandedUserId === user._id && (
                 <tr>
                   <td colSpan={7} className="px-6 py-4 bg-gray-200">
-                    <div className="flex gap-6">
-                      <div className="flex gap-2 flex-col">
-                        <div className="text-sm text-gray-900">
-                          <strong>Phone:</strong> {user.linkedPhoneNumber}
+                    <div className="flex gap-16">
+                      <div className="flex gap-2 flex-col w-1/3">
+                        <div className="text-sm text-gray-900 ">
+                          <p>Phone:</p> {user.linkedPhoneNumber}
                         </div>
                         <div className="text-sm text-gray-900">
-                          <strong>Email:</strong> {user.email}
+                          <p>Email:</p> {user.email}
                         </div>
                         <div className="text-sm text-gray-900">
-                          <strong>Bank Details:</strong> {user.bankAccountDetails}
+                          <p>Bank Details:</p> {user.bankAccountDetails}
                         </div>
                       </div>
                       <div className="flex gap-2 flex-col">
                         <div className="text-sm text-gray-900">
-                          <strong>Phone:</strong> {user.linkedPhoneNumber}
+                          <p>Phone:</p> {user.linkedPhoneNumber}
                         </div>
                         <div className="text-sm text-gray-900">
-                          <strong>Email:</strong> {user.email}
+                          <p>Email:</p> {user.email}
                         </div>
                         <div className="text-sm text-gray-900">
-                          <strong>Bank Details:</strong> {user.bankAccountDetails}
+                          <p>Bank Details:</p> {user.bankAccountDetails}
                         </div>
                       </div>
                     </div>

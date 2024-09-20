@@ -1,10 +1,10 @@
-import axios from "axios";
+import axios, { AxiosInstance } from 'axios';
 
-export const axiosInterceptorPage = () => {
+export const createAxiosInstance = (): AxiosInstance => {
   const axiosInstance = axios.create({
     baseURL: "http://localhost:5000",
     headers: { "Content-Type": "application/json" },
-    withCredentials: true, // Ensure cookies are sent with requests
+    withCredentials: true,
   });
 
   axiosInstance.interceptors.request.use(
@@ -22,31 +22,29 @@ export const axiosInterceptorPage = () => {
     (response) => response,
     async (error) => {
       const originalRequest = error.config;
-      if (
-        (error.response && error.response.status === 401) ||
-        (error.response && error.response.status === 400 && error.response.data === "Invalid or expired access token.")
-      ) {
-        if (!originalRequest._retry) {
-          originalRequest._retry = true;
-          try {
-            const response = await axios.post(
-              "http://localhost:5000/api/client/refresh-token",
-              { withCredentials: true }
-            );
-            const { accessToken } = response.data;
-            if (accessToken) {
-              localStorage.setItem("accessToken", accessToken);
-              axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-              originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
-              return axiosInstance(originalRequest);
-            }
-          } catch (refreshError) {
-            console.error('Refresh token error:', refreshError);
-            localStorage.removeItem("accessToken");
-            // Redirect to login page if refresh fails
-            window.location.href = '/';
-            return Promise.reject(refreshError);
+
+      if (error.response && error.response.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+
+        try {
+          const response = await axios.post(
+            "http://localhost:5000/api/common/refresh-token",
+            {},
+            { withCredentials: true }
+          );
+
+          const { accessToken } = response.data;
+          if (accessToken) {
+            localStorage.setItem("accessToken", accessToken);
+            axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+            originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+            return axiosInstance(originalRequest);
           }
+        } catch (refreshError) {
+          console.error('Refresh token error:', refreshError);
+          localStorage.removeItem("accessToken");
+          window.location.href = '/'; // Redirect to login page
+          return Promise.reject(refreshError);
         }
       }
       return Promise.reject(error);

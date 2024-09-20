@@ -1,7 +1,7 @@
 import React, { createContext, FC, ReactNode } from "react";
 import { ClientAddFormData } from "../../types/ClientFormType";
 import axios from "axios";
-import { axiosInterceptorPage } from "./Interceptor";
+import {  createAxiosInstance } from "./Interceptor";
 
 // Define the interface for the context value
 interface ClientContextType {
@@ -17,7 +17,7 @@ const ClientContext = createContext<ClientContextType | null>(null);
 
 export const ClientProvider: FC<ClientProviderProps> = ({ children }) => {
   const ClientCalendarAddForm = async (formData: ClientAddFormData) => {
-    const axiosInstance = axiosInterceptorPage();
+    const axiosInstance = createAxiosInstance();
   console.log(formData,'formdata,...')
     try {
       const response = await axiosInstance.post(

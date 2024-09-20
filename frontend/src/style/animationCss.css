@@ -1,0 +1,16 @@
+/* error button animation  */
+@keyframes slideUp {
+    0% {
+      transform: translateY(100px); /* Start below the screen */
+      opacity: 0; /* Fully transparent */
+    }
+    100% {
+      transform: translateY(0); /* End at the original position */
+      opacity: 1; /* Fully visible */
+    }
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+/* error button animation  */

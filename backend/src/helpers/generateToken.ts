@@ -1,4 +1,4 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload , TokenExpiredError } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -19,6 +19,7 @@ export const generateAccessToken = (userId: any): any => {
 
 export const generateRefreshToken = (userId: string): string => {
     const payload = { userId };
+    console.log(payload,'user id is user id')
           
     // Ensure REFRESH_TOKEN_SECRET is defined
     const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
@@ -31,17 +32,23 @@ export const generateRefreshToken = (userId: string): string => {
     return jwt.sign(payload, refreshTokenSecret, { expiresIn: '5d' });
 };
 
-
-export const verifyToken = (token: string, secret: string): JwtPayload | null => {
+interface VerifyTokenResult {
+    payload: JwtPayload | null;
+    error: string | null;
+  }
+export const verifyToken = (token: string, secret: string): VerifyTokenResult => {
     try {
-        
-        const decoded = jwt.verify(token, secret) as JwtPayload;
-        return decoded;
+      const decoded = jwt.verify(token, secret) as JwtPayload;
+      return { payload: decoded, error: null };
     } catch (error) {
-        console.error('Token verification failed:', error);
-        return null; 
+      if (error instanceof TokenExpiredError) {
+        console.error("Token verification failed: Token expired at", error.expiredAt);
+        return { payload: null, error: "TokenExpiredError" };
+      }
+      console.error("Token verification failed:", error);
+      return { payload: null, error: "InvalidTokenError" };
     }
-};
+  };
 
 
 export const getUserIdFromToken = (token: string): string | null => {

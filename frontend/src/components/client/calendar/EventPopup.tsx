@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { XMarkIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { axiosInterceptorPage } from '../../../context/modules/Interceptor';
+import { createAxiosInstance } from '../../../context/modules/Interceptor';
+
 
 interface EventPopupProps {
   event: {
@@ -35,7 +36,7 @@ const EventPopup: React.FC<EventPopupProps> = ({ event, onClose, onEdit, onDelet
   };
 
   const handleSave = async () => {
-    const axiosInstance = axiosInterceptorPage();
+    const axiosInstance = createAxiosInstance();
     try {
       await axiosInstance.put(
         `http://localhost:5000/api/admin/edit-calendar-items/${editedEvent.id}`,
@@ -55,9 +56,11 @@ const EventPopup: React.FC<EventPopupProps> = ({ event, onClose, onEdit, onDelet
   };
 
   const handleDelete = async (id: string) => {
-    const axiosInstance = axiosInterceptorPage();
+    onClose()
+    const axiosInstance = createAxiosInstance();
     try {
-      await axiosInstance.delete(`http://localhost:5000/api/admin/delete-calendar-items/${id}`);
+      await axiosInstance.delete(`http://localhost:5000/api/admin/delete-calendar-items/${id}`,
+      );
       onDelete(id);
     } catch (error) {
       console.error('Error deleting event:', error);

@@ -4,7 +4,6 @@ import { generateAccessToken, generateRefreshToken } from "../helpers/generateTo
 
 
 export const googleAuthCallback = async (req: Request, res: Response) => {
-  console.log("object");
 
   if (!req.user || typeof req.user !== "object") {
     return res.status(400).send("User is not authenticated");

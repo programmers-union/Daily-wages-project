@@ -15,6 +15,7 @@ const MainCategory: React.FC<MainCategoryProps> = ({ setActiveAddCategoryPopup }
     const GetMainCategory = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/admin/get-main-categories');
+        console.log(response.data,'this is data mian catogories')
         const categories = response.data.categories;
         setMainCategory(categories);
         // Set default category ID

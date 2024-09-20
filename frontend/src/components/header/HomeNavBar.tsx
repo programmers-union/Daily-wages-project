@@ -1,6 +1,6 @@
 import React, {  useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
-import { axiosInterceptorPage } from '../../context/modules/Interceptor';
+import {  createAxiosInstance } from '../../context/modules/Interceptor';
 
 
 const HomeNavBar:React.FC = () => {
@@ -18,7 +18,7 @@ const HomeNavBar:React.FC = () => {
       }
     };
   const logOutHandle = async ()=>{
-    const axiosInstance = axiosInterceptorPage();
+    const axiosInstance = createAxiosInstance();
     setIsOpen(false)
     try {
       const response = await axiosInstance.post('http://localhost:5000/api/common/logout')
@@ -39,11 +39,14 @@ const HomeNavBar:React.FC = () => {
     }, []);
    
   return (
-    <div className='bg-[#F0F0F0]'>
+    <div className=''>
       <div className="px-5 pt-6 flex justify-between items-center ">
           <p className="font-bold text-[1.5rem]"><span className="text-blue-300">D</span><span className="text-slate-500">W</span></p>
           <ul className="flex items-center gap-6 font-normal text-sm justify-center cursor-pointer ">
-            <li>Home</li>
+          <Link to='/home'>
+          <li>Home</li>
+           </Link>
+           
             <Link to='/client-calendar'>
             <li>Calendar</li>
             </Link>

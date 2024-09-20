@@ -8,6 +8,7 @@ import {
   EmailPasswordData,
   FormData,
 } from "../../types/authTypes/AuthTypes";
+// import Success from "../../components/success/Success";
 
 const AuthContext = createContext<AuthContextProps | null>(null);
 
@@ -15,12 +16,17 @@ export const AuthProvider = ({ children }: ChildrenNode) => {
   const [signupForm, setSignupForm] = useState<FormData | null>(null);
   const [loginEmailTrue, setLoginEmailTrue] = useState<string | undefined>();
   const [singleEmail , setSingleEmail] = useState<string>('');
+  const [signupError , setSignupError] = useState<string >('');
   const [ isCheckLoginClientOrEmployee, setIsCheckLoginClientOrEmployee] = useState<boolean | undefined>(false)
+  const [loginSuccess, setLoginSuccess] = useState<string>('')
+  const [loginError, setLoginError] = useState<string>('')
 
   const navigate = useNavigate();
 
   const SignUp = async (formData: FormData) => {
     setSignupForm(formData);
+  
+    // Ensure all fields are filled and trimmed
     if (
       formData.firstName.trim() &&
       formData.lastName.trim() &&
@@ -28,28 +34,31 @@ export const AuthProvider = ({ children }: ChildrenNode) => {
       formData.password.trim() &&
       formData.phoneNumber.trim() !== ""
     ) {
-      navigate("/otp");
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/client/signup",
-          formData
-        );
-        setSingleEmail(formData.email)
-        console.log(singleEmail,'this is single email data')
-        console.log("Sign-up process started", response.data);
+        // Make the signup request
+        const response = await axios.post("http://localhost:5000/api/client/signup", formData);
+        navigate("/otp");
+        const { data } = response;
+        setIsCheckLoginClientOrEmployee(data);
+        setSingleEmail(formData.email);
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error("sign up failed:", error.response?.data?.message);
-          throw error.response?.data?.message || "sign up failed";
+        // Handle Axios-specific errors
+        if (axios.isAxiosError(error)) { 
+          const errorMessage = error.response?.data?.msg;
+          setSignupError(errorMessage);
+          console.error("Sign up failed:", errorMessage);
         } else {
+          // Handle unexpected errors
+          setSignupError("An unexpected error occurred");
           console.error("An unexpected error occurred:", error);
-          throw "An unexpected error occurred";
         }
       }
     } else {
+      // Show alert if any of the required fields are missing
       alert("Please fill all the fields");
     }
   };
+  
 
   const EmailLogin = async (loginData: EmailData) => {
     try {
@@ -80,12 +89,14 @@ export const AuthProvider = ({ children }: ChildrenNode) => {
           }
         );
         console.log("Login process started", response.data);
-        localStorage.setItem("accessToken",response.data.accesstoken)
-        setIsCheckLoginClientOrEmployee(response.data.isCheck)
+        localStorage.setItem("accessToken",response.data.accesstoken);
+        setIsCheckLoginClientOrEmployee(response.data.isCheck);
+        setLoginSuccess('login successful')
           navigate("/home");
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          console.error("login failed:", error.response?.data?.message);
+          setLoginError(error.response?.data?.msg)
+          console.error("login failed:", error.response?.data?.msg);
           throw error.response?.data?.message || "login failed";
         } else {
           console.error("An unexpected error occurred:", error);
@@ -99,7 +110,7 @@ export const AuthProvider = ({ children }: ChildrenNode) => {
 
   return (
     <AuthContext.Provider
-      value={{ SignUp, EmailLogin, Login, signupForm, loginEmailTrue , singleEmail ,isCheckLoginClientOrEmployee }}
+      value={{ SignUp, EmailLogin, Login, loginSuccess,loginError, signupForm, signupError, loginEmailTrue , singleEmail ,isCheckLoginClientOrEmployee }}
     >
       {children}
     </AuthContext.Provider>

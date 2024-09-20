@@ -1,35 +1,46 @@
 import React, { useContext, useState, useCallback, ChangeEvent, FormEvent } from 'react';
-import { XMarkIcon, MapPinIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import AdminFormContext from '../../../context/modules/AdminFormContext';
 import { AdminFormListData, Item } from '../../../types/AdminGategoryType';
-import GoogleMap from './GoogleMap';
 import { ClientAddFormData, ClientForm, PropsData } from '../../../types/ClientFormType';
 import ClientContext from '../../../context/modules/ClientFormContext';
+import LocationAndMap from './LocationAndMap';
 
 const JobRequestForm: React.FC<PropsData> = ({ setIsActive, calendarDate }) => {
   const [formData, setFormData] = useState<ClientAddFormData>({
     jobTitle: '',
     time: '',
-    location: '',
+    location: {
+      country: '',
+      state: '',
+      district: '',
+      city: '',
+      mapLocation: undefined,
+    },
     description: '',
   });
   const [mapLocation, setMapLocation] = useState<boolean>(false);
   const [dropClick, setDropClick] = useState<boolean>(false);
 
-  const context = useContext(AdminFormContext);
-  const { getSubCategoriesItemsDatas } = context as AdminFormListData;
+  const { getSubCategoriesItemsDatas } = useContext(AdminFormContext) as AdminFormListData;
+  const { ClientCalendarAddForm } = useContext(ClientContext) as ClientForm;
 
-  const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    if (name === 'country' || name === 'state' || name === 'district' || name === 'city') {
+      setFormData((prevData) => ({
+        ...prevData,
+        location: { ...prevData.location, [name]: value }
+      }));
+    } else {
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
+    }
   }, []);
 
   const handleJobTitleClick = (jobTitle: string) => {
     setFormData((prevData) => ({ ...prevData, jobTitle }));
     setDropClick(false);
   };
-
-  const { ClientCalendarAddForm } = useContext(ClientContext) as ClientForm;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -39,24 +50,25 @@ const JobRequestForm: React.FC<PropsData> = ({ setIsActive, calendarDate }) => {
       alert('Invalid date format');
       return;
     }
+
     const [, month, day, year] = dateParts;
     const monthIndex = new Date(Date.parse(`${month} 1, 2012`)).getMonth() + 1;
-    const dateString = `${year}-${String(monthIndex).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const formattedDate = new Date(dateString).toISOString();
+    const formattedDate = `${year}-${String(monthIndex).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-    if (!formData.jobTitle.trim() || !formData.time.trim() || !formData.location.trim() || !formData.description.trim()) {
+    if (!formData.jobTitle.trim() || !formData.time.trim()  || !formData.description.trim()) {
       alert('Please fill in all fields');
       return;
     }
 
     const calendarAddData = {
       ...formData,
-      date: formattedDate,
+      date: new Date(formattedDate).toISOString(),
     };
 
     ClientCalendarAddForm(calendarAddData);
     setIsActive(false);
   };
+
   const toggleMapLocation = () => {
     setMapLocation((prev) => !prev);
   };
@@ -114,20 +126,13 @@ const JobRequestForm: React.FC<PropsData> = ({ setIsActive, calendarDate }) => {
                   required
                 />
               </div>
-              <h6 className="text-blue-600 text-sm hover:text-blue-700">Location</h6>
-              <div className="flex items-center space-x-2">
-                <MapPinIcon onClick={toggleMapLocation} className="h-6 w-6 cursor-pointer text-gray-400" />
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  placeholder="Add location"
-                  className="flex-grow border-b border-gray-300 text-xs pb-2 placeholder:text-gray-300 focus:border-blue-500 outline-none"
-                  required
-                />
-              </div>
-              {mapLocation && <GoogleMap />}
+              <LocationAndMap 
+                mapLocation={mapLocation} 
+                toggleMapLocation={toggleMapLocation} 
+                formData={formData} 
+                handleInputChange={handleInputChange} 
+                setFormData={setFormData}
+              />
               <textarea
                 name="description"
                 value={formData.description}
@@ -137,8 +142,8 @@ const JobRequestForm: React.FC<PropsData> = ({ setIsActive, calendarDate }) => {
                 required
               />
             </div>
-            <div className="mt-6 flex justify-end space-x-2">
-              <button type="submit" className="px-4 py-2 bg-blue-600 text-sm text-white rounded hover:bg-blue-700">
+            <div className="mt-2 flex justify-end space-x-2">
+              <button type="submit" className="px-4 py-2 bg-blue-600 text-xs text-white rounded hover:bg-blue-700">
                 Save
               </button>
             </div>

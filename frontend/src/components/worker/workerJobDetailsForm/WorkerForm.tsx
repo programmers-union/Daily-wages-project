@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Form01 from './Form01';
 import Form02 from './Form02';
 import Form03 from './Form03';
-import Form04 from './Form04';
+// import Form04 from './Form04';
 import Form05 from './Form05';
 import { WorkerProgressBar } from './WorkerProgressBar';
 import { FormProgressProps } from '../../../types/AdminGategoryType';
@@ -38,9 +38,9 @@ const WorkerForm: React.FC = () => {
             {step === 1 && <Form01 {...formProps} />}
             {step === 2 && <Form02 {...formProps} />}
             {step === 3 && <Form03 {...formProps} />}
-            {step === 4 && <Form04 {...formProps} />}
-            {step === 5 && <Form05 {...formProps} />}
-            {step === 6 && <SignUp />}
+            {/* {step === 4 && <Form04 {...formProps} />} */}
+            {step === 4 && <Form05 {...formProps} />}
+            {step === 5 && <SignUp />}
         </div>
     );
 };
