@@ -18,6 +18,17 @@ interface CalendarEvent {
   end: Date;
   description: string;
   location: string;
+  id: string;
+}
+interface Event {
+  date: string;
+  time: string;
+  _id: string; // Add this line to include the _id property
+  jobTitle: {
+    jobTitle: string;
+  };
+  description: string;
+  location: string;
 }
 
 const ClientCalendar: React.FC = () => {
@@ -34,7 +45,7 @@ const ClientCalendar: React.FC = () => {
       try {
         const response = await axiosInstance.get('http://localhost:5000/api/client/calender-show-data');
         if (response.data && Array.isArray(response.data.data)) {
-          const formattedData = response.data.data.map((event: any) => {
+          const formattedData = response.data.data.map((event: Event) => {
             const [year, month, day] = event.date.split('T')[0].split('-');
             const [hours, minutes] = event.time.split(':');
             const startDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes));
@@ -61,7 +72,7 @@ const ClientCalendar: React.FC = () => {
       }
     };
     getCalendarDate();
-  }, []);
+  }, [axiosInstance]);
 
   useEffect(() => {
     const getMainCategory = async () => {
@@ -92,12 +103,16 @@ const ClientCalendar: React.FC = () => {
   };
   const handleJobRequestSubmit = () => {
     // Fetch the latest data after a new job request is submitted
-    getCalendarDate();
+    setCalendarDate(new Date().toISOString());
   };
+  const handleEditEvent = ( ) => {
+
+  }
+  const handleDeleteEvent = ( ) => {}
 
   return (
     <>
-      <div className="p-6 helvetic">
+      <div className="p-6 helvetic mt-16">
         <Calendar
           views={["day", "agenda", "work_week", "month"]}
           localizer={localizer}
@@ -114,12 +129,17 @@ const ClientCalendar: React.FC = () => {
       </div>
       {selectedEvent && (
       <EventPopup
-        event={selectedEvent}
-        onClose={() => setSelectedEvent(null)}
+      event={selectedEvent}
+      onClose={() => setSelectedEvent(null)}
+      onEdit={handleEditEvent} // Add this line
+      onDelete={handleDeleteEvent} 
       />
     )}
       {isActive && (
-        <JobRequestForm calendarDate={calendarDate} setIsActive={setIsActive} onSubmitSuccess={handleJobRequestSubmit} />
+        <JobRequestForm 
+        calendarDate={calendarDate ?? ""} 
+        setIsActive={setIsActive} 
+        onSubmitSuccess={handleJobRequestSubmit } />
       )}
     </>
   );

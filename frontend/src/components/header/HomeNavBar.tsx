@@ -39,7 +39,7 @@ const HomeNavBar:React.FC = () => {
     }, []);
    
   return (
-    <div className=''>
+    <div className='bg-transparent fixed top-0 left-0 w-full'>
       <div className="px-5 pt-6 flex justify-between items-center ">
           <p className="font-bold text-[1.5rem]"><span className="text-blue-300">D</span><span className="text-slate-500">W</span></p>
           <ul className="flex items-center gap-6 font-normal text-sm justify-center cursor-pointer ">

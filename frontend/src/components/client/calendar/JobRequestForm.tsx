@@ -2,9 +2,30 @@ import React, { useContext, useState, useCallback, ChangeEvent, FormEvent } from
 import { XMarkIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import AdminFormContext from '../../../context/modules/AdminFormContext';
 import { AdminFormListData, Item } from '../../../types/AdminGategoryType';
-import { ClientAddFormData, ClientForm, PropsData } from '../../../types/ClientFormType';
+import { ClientForm  } from '../../../types/ClientFormType';
 import ClientContext from '../../../context/modules/ClientFormContext';
 import LocationAndMap from './LocationAndMap';
+
+// Update this interface in your types file
+interface ClientAddFormData {
+  jobTitle: string;
+  time: string;
+  location: {
+    country: string;
+    state: string;
+    district: string;
+    city: string;
+    mapLocation?: google.maps.LatLngLiteral; // Assuming you're using Google Maps
+    fullLocation?: string;
+  };
+  description: string;
+  date?: string; // Add this if it's expected in the form data
+}
+interface PropsData {
+  setIsActive: React.Dispatch<React.SetStateAction<boolean>>;
+  calendarDate: string;
+  onSubmitSuccess: () => void; // Add this line
+}
 
 const JobRequestForm: React.FC<PropsData> = ({ setIsActive, calendarDate }) => {
   const [formData, setFormData] = useState<ClientAddFormData>({
@@ -55,17 +76,26 @@ const JobRequestForm: React.FC<PropsData> = ({ setIsActive, calendarDate }) => {
     const monthIndex = new Date(Date.parse(`${month} 1, 2012`)).getMonth() + 1;
     const formattedDate = `${year}-${String(monthIndex).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-    if (!formData.jobTitle.trim() || !formData.time.trim()  || !formData.description.trim()) {
+    if (!formData.jobTitle.trim() || !formData.time.trim() || !formData.description.trim()) {
       alert('Please fill in all fields');
       return;
     }
 
-    const calendarAddData = {
+    // Combine country, state, and district into a single string
+    const fullLocation = `${formData.location.country}, ${formData.location.state}, ${formData.location.district}`;
+
+    // Prepare the final data
+    const calendarAddData: ClientAddFormData = {
       ...formData,
+      location: { ...formData.location, fullLocation },
       date: new Date(formattedDate).toISOString(),
     };
-
-    ClientCalendarAddForm(calendarAddData);
+    const locationString = `${calendarAddData.location.city}, ${calendarAddData.location.state}, ${calendarAddData.location.country}`;
+    // Send the updated data to the context method
+    ClientCalendarAddForm({
+      ...calendarAddData,
+      location: locationString
+    });
     setIsActive(false);
   };
 
@@ -101,11 +131,11 @@ const JobRequestForm: React.FC<PropsData> = ({ setIsActive, calendarDate }) => {
                 <div className="absolute top-2 left-0 z-40 w-full">
                   <div className="border border-gray-400 rounded-md py-2 w-full px-4 max-h-20 overflow-y-scroll bg-white text-xs flex flex-col gap-2">
                     {getSubCategoriesItemsDatas
-                      .filter((item: Item) => item.jobTitle.toLowerCase().includes(formData.jobTitle.toLowerCase()))
+                      .filter((item: Item) => item.jobTitle?.toLowerCase().includes(formData.jobTitle.toLowerCase()))
                       .map((item: Item, index: number) => (
                         <div
                           key={index}
-                          onClick={() => handleJobTitleClick(item.jobTitle)}
+                          onClick={() => handleJobTitleClick(item.jobTitle ?? "")}
                           className="flex items-center gap-2 cursor-pointer"
                         >
                           {item.jobTitle}

@@ -2,6 +2,7 @@ import { MapPinIcon } from "@heroicons/react/24/outline";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import GoogleMap from "./GoogleMap";
 import { Country, State, City } from 'country-state-city';
+import { Link } from "react-router-dom";
 
 interface ClientAddFormData {
   jobTitle: string;
@@ -58,7 +59,6 @@ const LocationAndMap: React.FC<LocationType> = ({
   const [countries, setCountries] = useState<CountryType[]>([]);
   const [states, setStates] = useState<StateType[]>([]);
   const [cities, setCities] = useState<CityType[]>([]);
-
   // Fetch all countries when the component mounts
   useEffect(() => {
     setCountries(Country.getAllCountries());
@@ -79,11 +79,15 @@ const LocationAndMap: React.FC<LocationType> = ({
     const selectedState = states.find(state => state.name === formData.location.state);
     const selectedCountry = countries.find(country => country.name === formData.location.country);
     if (selectedState && selectedCountry) {
-      setCities(City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode));
+      setCities(City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode)
+        .filter((city): city is CityType => 
+          city.latitude !== null && city.latitude !== undefined
+        )
+      );
     } else {
       setCities([]);
     }
-  }, [formData.location.state, states, countries]);
+  },[formData.location.state, formData.location.country, states, countries]);
 
   return (
     <div>
@@ -138,7 +142,7 @@ const LocationAndMap: React.FC<LocationType> = ({
 
       {formData.location.district && (
         <div className="flex items-center space-x-2">
-          <MapPinIcon onClick={toggleMapLocation} className="h-6 w-6 cursor-pointer text-gray-400" />
+         <Link to='#'> <MapPinIcon onClick={toggleMapLocation} className="h-6 w-6 cursor-pointer text-gray-400" /> </Link>
           <input
             type="text"
             value={`${formData.location.country}, ${formData.location.state}, ${formData.location.district}`}
@@ -149,16 +153,19 @@ const LocationAndMap: React.FC<LocationType> = ({
         </div>
       )}
 
-      {mapLocation && (
-        <GoogleMap
-          onSelectLocation={(latLng) => {
-            setFormData((prevData) => ({
-              ...prevData,
-              location: { ...prevData.location, mapLocation: latLng },
-            }));
-          }}
-        />
-      )}
+{mapLocation && (
+  <GoogleMap
+    onClick={(e: google.maps.MapMouseEvent) => {
+      const latLng = e?.latLng;  // Ensure latLng exists
+      if (latLng) {
+        setFormData((prevData) => ({
+          ...prevData,
+          location: { ...prevData.location, mapLocation: latLng.toJSON() },
+        }));
+      }
+    }}
+  />
+)}
     </div>
   );
 };
