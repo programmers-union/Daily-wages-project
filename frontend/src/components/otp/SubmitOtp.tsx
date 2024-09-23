@@ -10,7 +10,7 @@ import { WorkerFormStateType } from "../../types/WorkerTypes";
 const OtpPage: React.FC = () => {
   const [otpData, setOtpData] = useState<string[]>(Array(6).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const [timeLeft, setTimeLeft] = useState<number>(20);
+  const [timeLeft, setTimeLeft] = useState<number>(60);
 
   useEffect(() => {
     if (inputRefs.current[0]) {
@@ -64,7 +64,7 @@ const OtpPage: React.FC = () => {
       signup: emailOnlyData,
     };
     OTPReset(otpAndSignup);
-    setTimeLeft(20);
+    setTimeLeft(60);
   };
 
   const otpSubmitHandle = () => {

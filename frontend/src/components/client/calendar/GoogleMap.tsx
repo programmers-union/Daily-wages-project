@@ -1,34 +1,39 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 declare global {
   interface Window {
-    google: typeof google; // Correct type for google object
+    google: typeof google;
   }
 }
 
-const GoogleMap: React.FC = () => {
+interface GoogleMapProps {
+  onClick?: (e: google.maps.MapMouseEvent) => void;
+}
+
+const GoogleMap: React.FC<GoogleMapProps> = ({ onClick }) => {
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
 
   useEffect(() => {
     const initMap = () => {
       if (mapRef.current && window.google) {
         try {
-           new window.google.maps.Map(mapRef.current, {
+          const newMap = new window.google.maps.Map(mapRef.current, {
             center: { lat: -34.397, lng: 150.644 },
             zoom: 8,
           });
+          setMap(newMap);
         } catch (error) {
           console.error('Error loading Google Maps', error);
         }
       }
     };
 
-    // Ensure the Google Maps API script is loaded before initializing the map
     if (window.google) {
       initMap();
     } else {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDFXRG1d6ydidZAT2iO3pGc-MKVavOnBsM`;
       script.async = true;
       script.defer = true;
       script.onload = initMap;
@@ -36,7 +41,14 @@ const GoogleMap: React.FC = () => {
     }
   }, []);
 
-  return <div ref={mapRef} style={{ height: '50vh', width: '100%' }} />;
+  useEffect(() => {
+    if (map && onClick) {
+      const listener = map.addListener('click', onClick);
+      return () => listener.remove();
+    }
+  }, [map, onClick]);
+
+  return <div ref={mapRef} style={{ height: '30vh', width: '100%' }} />;
 };
 
 export default GoogleMap;

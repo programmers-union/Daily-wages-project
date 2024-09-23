@@ -3,6 +3,7 @@ import axios from "axios";
 import { OtpAndSignupType, OtpContextType } from "../../types/Otp";
 import { useNavigate } from "react-router-dom";
 import swal from "sweetalert";
+import Success from "../../components/success/Success";
 
 const OtpContext = createContext<OtpContextType | undefined>(undefined);
 
@@ -21,10 +22,10 @@ const OtpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     [isCheckClientOrWorker]
   );
 
-  const handleResponse = (response:any, successMessage: string) => {
+  const handleResponse = (response:any) => {
     if (response && response.data) {
       const { accesstoken, otpVerified } = response.data;
-
+console.log(accesstoken,'$$$$$$$------------$$$$$$$$$$')
       if (typeof accesstoken === "string") {
         localStorage.setItem("accessToken", accesstoken);
       } else {
@@ -36,12 +37,7 @@ const OtpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
           navigate("/change-password");
         } else {
           navigate("/home");
-          swal({
-            title: "Success!",
-            text: successMessage,
-            icon: "success",
-            timer: 3000,
-          });
+          <Success success='verification successful' />
         }
       } else {
         console.error("OTP not verified:", response.data);
@@ -56,7 +52,7 @@ const OtpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       const response = await axios.patch(getEndpoint("verify-otp"), otp, {
         withCredentials: true,
       });
-      handleResponse(response, "Password changed");
+      handleResponse(response);
     } catch (error) {
       console.error("OTP submit error:", error);
     }

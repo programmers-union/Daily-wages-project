@@ -6,7 +6,7 @@ import { generateOtp, sendOtpToUser } from "../helpers/otpHelper";
 import { handleForgotPassword } from "../helpers/forgotPasswordHelper";
 import { changePassword } from "../helpers/changePasswordHelper";
 import { handleMailCheck } from "../helpers/loginMailCheckHelper";
-import bcrypt from "bcryptjs";
+import bcrypt, { genSaltSync, hashSync } from "bcryptjs";
 import { ResendOtpEmployeeRequestBody,SignupEmployeeRequestBody,VerifyOtpEmployeeRequestBody,} from "../types/employee/request";
 import {ErrorResponseEmployee,SuccessResponseEmployee,} from "../types/employee/response";
 import { ErrorResponse } from "client/response";
@@ -17,6 +17,7 @@ import {verifyOtpHelper} from "../helpers/verifyHelper";
 import {handleResendOtp} from "../helpers/resendOtpHelper";
 import uploadIcon from "../config/cloudinaryConfig";
 import uploadToCloudinary from "../config/cloudinaryConfig";
+import Client from "../models/Client";
 
 
 
@@ -25,41 +26,80 @@ export const signupEmployee = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log("ivide ethyyy");
+ console.log(req.body,'_____req body_____')
   const errors = validationResult(req);
+  console.log("errors:------------",errors);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ msg: 'Worker validation failed', errors: errors.array() });
+    return res.status(400).json({
+      msg: 'Worker validation failed',
+      errors: errors.array(),
+    });
   }
-
   const {
     firstName, lastName, email, dob, password, phoneNumber, gender,
     address, selectState, selectDistrict, selectCity, pinCode,
-    skills, qualification, experience, skillLevel, holderName,
-    accoutNumber, bank, ifsc, branch, linkPhoneNumber, idProof, uniqueId,
+    skills, qualification, experience, skillLevel, idProof, uniqueId,
   } = req.body;
 
   try {
     // Extract files from the request
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
-    console.log(files,'765765')
-    const idProofFile = files?.['idProofFile']?.[0];
-    const profilePicture = files?.['profilePicture']?.[0];
-console.log(idProofFile,'1212')
-console.log(profilePicture,'0000')
-    // Upload files to Cloudinary if they exist
-    const proofPIC = idProofFile ? await uploadToCloudinary(idProofFile.buffer) : '';
-    const profilePic = profilePicture ? await uploadToCloudinary(profilePicture.buffer) : '';
-    console.log("proofPIC:",proofPIC);
-    console.log("profilePic:",profilePic);
-    // ... rest of the controller code ...
+    // const files = req.files as {
+    //   [fieldname: string]: Express.Multer.File[];
+    // } | undefined;
+    // console.log('Files Received:', req.files);
+    // const idProofFile = files?.['idProofFile']?.[0];
+    // const profilePic = files?.['profilePic']?.[0];
 
+    // Upload files to Cloudinary if they exist
+    // const idProofFileUrl = idProofFile
+    //   ? await uploadToCloudinary(idProofFile.buffer)
+    //   : '';
+    // const profilePicUrl = profilePic
+    //   ? await uploadToCloudinary(profilePic.buffer)
+    //   : '';
+
+    // console.log('Uploaded ID Proof URL:', idProofFileUrl);
+    // console.log('Uploaded Profile Pic URL:', profilePicUrl);
+
+    const checkEmailInDb:any | null = await Client.findOne({email});
+     if(checkEmailInDb){
+     return res.status(401).json({msg:'email or password is already exists'});
+     }
+     let employee = await Employee.findOne({ email });
+    if (employee) {
+      return res.status(409).json({ msg: "email or password  already exists" });
+    }
+    // Prepare new employee form data
     const newEmployeeFormData = new EmployeeForm({
-      dob, gender, address, selectState, selectDistrict, selectCity, pinCode,
-      skills, qualification, experience, skillLevel, holderName, accoutNumber,
-      bank, ifsc, branch, linkPhoneNumber, idProof, uniqueId,
-      idProofFile: proofPIC, profilePic,
+      firstName, lastName, email, dob, password, phoneNumber, gender,
+      address, selectState, selectDistrict, selectCity, pinCode,
+      skills, qualification, experience, skillLevel, idProof, uniqueId
     });
+     
+    // Save the form data to the database
     await newEmployeeFormData.save();
 
+    const otp = generateOtp();
+    const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
+
+    const salt = genSaltSync(10);
+    const hash = hashSync(password, salt);
+
+    const newEmployee = new Employee({
+      firstName,
+      lastName,
+      email,
+      password: hash,
+      phoneNumber,
+      otp,
+      otpExpiry,
+    });
+
+    await newEmployee.save();
+
+    await sendOtpToUser(phoneNumber, otp);
+    // Send success response
     res.status(201).json({ msg: 'OTP sent for verification' });
   } catch (error) {
     console.error('Error in signupEmployee:', error);
@@ -73,10 +113,7 @@ export const verifyOtpEmployee = async (
   next: NextFunction
 ) => {
   
-  console.log(req.body,'otp body');
   const { otp } = req.body;
-  console.log(otp,'otp');
-  console.log(Employee,'Employee,,,,,,,')
   await verifyOtpHelper(otp, Employee as any, res, next);
 };
 

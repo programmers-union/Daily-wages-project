@@ -8,6 +8,7 @@ import bcrypt from "bcryptjs";
 import uploadIcon from "../config/cloudinaryConfig";
 import SubCategoryItem from "../models/SubCategoryItems";
 import EmployeeForm from "../models/EmployeeForm";
+import JobRequest from "../models/JobRequest";
 
 
 export const signupAdmin = async (
@@ -287,7 +288,6 @@ export const getEmployeeData = async (req: Request, res: Response , next:NextFun
   console.log('object')
   try {
     const employee = await EmployeeForm.find();
-    console.log(employee,'seeeeee')
     if (!employee) {
       return res.status(404).json({ msg: "Employee not found" });
     }
@@ -297,3 +297,22 @@ export const getEmployeeData = async (req: Request, res: Response , next:NextFun
    next(error);
   }
 }
+
+
+export const deletCalendarItems = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.params;
+  console.log(id,'id id id ')
+  try {
+    const result = await JobRequest.findByIdAndDelete(id);
+    if (!result) {
+      return res.status(404).json({ msg: "Event not found" });
+    }
+    res.status(200).json({ msg: "Event deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};

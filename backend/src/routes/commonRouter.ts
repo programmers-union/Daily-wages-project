@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { clientChangePassword, clientForgotPassword, clientLogout, loginClient, resendOtp } from "../controllers/commonController";
+import { clientChangePassword, clientForgotPassword, clientLogout, loginClient, profile, refreshToken, resendOtp } from "../controllers/commonController";
 import { loginMailCheck } from "../controllers/commonController";
 import authMiddleware from "../middlewares/authMiddleware";
 
@@ -11,5 +11,7 @@ commonRouter.get("/forgot-password", clientForgotPassword);
 commonRouter.patch("/change-password", clientChangePassword);
 commonRouter.post("/resend-otp", resendOtp);
 commonRouter.post("/logout",authMiddleware, clientLogout);
+commonRouter.get("/profile", authMiddleware, profile);
+commonRouter.post("/refresh-token", refreshToken);
 
 export default commonRouter;

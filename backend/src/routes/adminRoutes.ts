@@ -9,6 +9,7 @@ import {
   addSubCategoryItems,
   getSubCategoryItems,
   getEmployeeData,
+  deletCalendarItems,
 } from "../controllers/adminController";
 const adminRouter = Router();
 import multer from "multer";
@@ -29,5 +30,6 @@ adminRouter.get('/get-sub-category-items',getSubCategoryItems);
 adminRouter.get("/get-clients", getClientsData);
 adminRouter.get("/get-employees", getEmployeesData);
 adminRouter.get("/get-employee-data",getEmployeeData);
+adminRouter.delete("/delete-calendar-items/:id",deletCalendarItems);
 
 export default adminRouter;

@@ -38,12 +38,12 @@ const Form05: React.FC<FormProgressProps> = ({  prevStep }) => {
         if (!formDataWorker.uniqueId) {
             newErrors.uniqueId = "Unique Id is required";
         }
-        if (!formDataWorker.idProofFile) {
-            newErrors.idProofFile = "Id proof file is required";
-        }
-        if (!formDataWorker.profilePic) {
-            newErrors.profilePic = "Id proof file is required";
-        }
+        // if (!formDataWorker.idProofFile) {
+        //     newErrors.idProofFile = "Id proof file is required";
+        // }
+        // if (!formDataWorker.profilePic) {
+        //     newErrors.profilePic = "Id proof file is required";
+        // }
         return newErrors;
     };
 
@@ -109,7 +109,7 @@ const Form05: React.FC<FormProgressProps> = ({  prevStep }) => {
                                     name='idProofFile'
                                     className="text-xs mt-1 block w-full border-b border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-[#f9f9fc] bg-transparent"
                                     onChange={handleFileChange}
-                                    required
+                                    
                                 />
                                 {errors.idProofFile && <p className="text-red-500 text-xs mt-1">{errors.idProofFile}</p>}
                             </div>
@@ -121,7 +121,7 @@ const Form05: React.FC<FormProgressProps> = ({  prevStep }) => {
                                     name='profilePic'
                                     className="text-xs mt-1 block w-full border-b border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-[#f9f9fc] bg-transparent"
                                     onChange={handleFileChange}
-                                    required
+                                    
                                 />
                                 {errors.profilePic && <p className="text-red-500 text-xs mt-1">{errors.profilePic}</p>}
                             </div>

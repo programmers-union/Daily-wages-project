@@ -9,6 +9,7 @@ import ClientCalendar from "../../client/calendar/ClientCalendar";
 import DashboardHome from "../DashboardHome/DashboardHome";
 import WorkerList from "../workerDashboard/WorkerList";
 import dashBoardSideBarData from "../../../pages/json/data.json";
+import ClientCalendarDashboard from "../clientDashboard/ClientCalendarDashboard";
 // import { FormProgressProps } from '../../../types/AdminGategoryType';
 
 interface DashBoardSideBarData {
@@ -146,7 +147,7 @@ const DashboardPage: React.FC = () => {
               />
             )}
           {sideClickCategory === "clientSideBarData" &&
-            sideMenuClickedItemsDisplay === 3 && <ClientCalendar />}
+            sideMenuClickedItemsDisplay === 3 && <ClientCalendarDashboard />}
           {sideClickCategory === "workerSideBarData" &&
             sideMenuClickedItemsDisplay === 0 && <WorkerList />}
         </section>

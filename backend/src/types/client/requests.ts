@@ -26,3 +26,4 @@ export interface VerifyOtpRequestBody {
 export type EmailRequestBody = Pick<SignupClientRequestBody, 'email'>;
 
 export type LoginRequestBody=Pick<SignupClientRequestBody, 'email'|'password'>;
+

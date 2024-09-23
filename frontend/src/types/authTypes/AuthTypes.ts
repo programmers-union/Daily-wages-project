@@ -19,6 +19,9 @@ export interface AuthContextProps {
   loginEmailTrue: string | boolean | undefined ;
   singleEmail:string
   isCheckLoginClientOrEmployee: boolean | undefined ;
+  signupError: string  ;
+  loginError:string 
+  loginSuccess:string
 }
 
 export interface ChildrenNode {

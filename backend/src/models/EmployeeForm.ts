@@ -13,12 +13,13 @@ export interface IEmployeeForm extends Document {
   qualification: string;
   experience: string;
   skillLevel: string;
-  holderName: string;
-  accoutNumber: string;
-  bank: string;
-  ifsc: string;
-  branch: string;
-  linkPhoneNumber: string;
+  email:string;
+  // holderName: string;
+  // accoutNumber: string;
+  // bank: string;
+  // ifsc: string;
+  // branch: string;
+  // linkPhoneNumber: string;
   idProof: string;
   uniqueId: string;
 //   idProofFile?: string;
@@ -36,16 +37,17 @@ const EmployeeFormSchema: Schema = new Schema({
   qualification: { type: String, required: true },
   experience: { type: String, required: true },
   skillLevel: { type: String, required: true },
-  holderName: { type: String, required: true },
-  accoutNumber: { type: String, required: true },
-  bank: { type: String, required: true },
-  ifsc: { type: String, requird: true },
-  branch: { type: String, required: true },
-  linkPhoneNumber: { type: String, required: true },
+  email: { type: String, required: true },
+  // holderName: { type: String, required: true },
+  // accoutNumber: { type: String, required: true },
+  // bank: { type: String, required: true },
+  // ifsc: { type: String, requird: true },
+  // branch: { type: String, required: true },
+  // linkPhoneNumber: { type: String, required: true },
   idProof: { type: String, required: true },
   uniqueId: { type: String, required: true },
-  idProofFile: { type: String, required: true },
-  profilePic: { type: String, required: true },
+  // idProofFile: { type: String, required: true },
+  // profilePic: { type: String, required: true },
 });
 
 const EmployeeForm = mongoose.model<IEmployeeForm>(

@@ -12,10 +12,7 @@ import multer from "multer";
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-employeeRouter.post("/worker-signUp", validateEmployerSignup, upload.fields([
-  { name: 'idProofFile', maxCount: 1 },
-  { name: 'profilePicture', maxCount: 1 },
-]), signupEmployee);
+employeeRouter.post("/worker-signUp", validateEmployerSignup, signupEmployee);
 employeeRouter.patch("/verify-otp", verifyOtpEmployee);
 
 

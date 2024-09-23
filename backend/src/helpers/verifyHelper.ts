@@ -4,7 +4,7 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../helpers/generateToken";
-import { SuccessResponse, ErrorResponse } from "../types/client/response";
+import { SuccessResponse, ErrorResponse, DBClient } from "../types/client/response";
 
 interface User {
   otp: string | undefined;
@@ -37,25 +37,27 @@ export const verifyOtpHelper = async (
     }
     user.otp = undefined;
     user.isVerified = true;
-    console.log(" zero object");
     const { accessToken, expiresIn } = generateAccessToken(String(user._id));
     const refreshToken = generateRefreshToken(String(user._id));
+    console.log(refreshToken,'genrara;8888')
     user.refreshToken = refreshToken;
     await user.save();
-    console.log("ok");
-    res.cookie("jwtRefreshToken", refreshToken, {
+
+    // Fetch client details and map to match the DBClient structure
+    res.cookie('jwtRefreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //
-      maxAge: 5 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 
+      maxAge: 5 * 24 * 60 * 60 * 1000, 
+      
     });
-    let accesstoken = accessToken;
-    let expiresin = expiresIn;
+    // Map clientDetails to match DBClient structure
+
     res.status(200).json({
       msg: "OTP verified successfully",
       otpVerified: true,
-      accesstoken,
-      expiresin,
+      accesstoken: accessToken,
+      expiresin: expiresIn,
     });
   } catch (error) {
     next(error);

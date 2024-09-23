@@ -11,6 +11,8 @@ export const handleForgotPassword = async (
   res: Response<{ msg: string; signUp?: boolean }>,
   next: NextFunction
 ) => {
+
+  
   try {
     if (!identifier) {
       return res.status(400).json({ msg: 'Identifier is required' });

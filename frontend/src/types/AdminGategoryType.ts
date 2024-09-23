@@ -35,6 +35,10 @@ export interface EmployeeData {
   email: string;
   bankAccountDetails: string;
 }
+
+export interface Category {
+  subCategoryItems: string[];
+}
 export interface AdminFormListData {
   AdminFormAdding: (formDataAdmin: AdminFormData) => Promise<void>;
   setMainCategoryId: (id: string) => void;
@@ -46,6 +50,7 @@ export interface AdminFormListData {
   getSubCategoriesItemsDatas: Item[];
   setGetSubCategoriesItemsDatas: (values: Item[]) => void;
   getEmployeeFullData:EmployeeData[] 
+  passingCategoriesDataAllPage: Category;
 }
 export interface MainCategoryProps {
   setActiveAddCategoryPopup: (active: boolean) => void;

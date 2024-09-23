@@ -7,6 +7,7 @@ body {
   font-family: Delicious;
   src: url("Delicious-Roman.otf");
 }
+
 @font-face {
   font-family: Delicious;
   font-weight: bold;
@@ -26,7 +27,7 @@ body {
 
 .custom-scrollbar-container::-webkit-scrollbar {
   width: 7px;
-  height: 7px;
+  height: fit-content;
 }
 .custom-scrollbar-container::-webkit-scrollbar-thumb {
   background-color: #aba7a7; 
@@ -35,6 +36,8 @@ body {
 .custom-scrollbar-container::-webkit-scrollbar-track {
   background-color: #ddd; 
 }
+
+
 
 /* animaiton in top to bottom  */
 
