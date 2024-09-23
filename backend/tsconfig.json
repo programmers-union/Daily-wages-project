@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    
     "target": "ES6",
     "module": "commonjs",
     "strict": true,
@@ -12,7 +11,9 @@
     "baseUrl": ".",
     "paths": {
       "*": ["node_modules/*", "src/types/*"]
-    }
+    },
+    "moduleResolution": "node",
+    "resolveJsonModule": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
