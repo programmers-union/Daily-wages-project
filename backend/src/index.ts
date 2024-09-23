@@ -39,7 +39,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/', (req, res) => {
-    res.json('hallo world',)
+    res.send('hallo world',)
 })
 app.use('/api/client', clientRoutes);
 app.use('/api/admin', adminRoutes);
