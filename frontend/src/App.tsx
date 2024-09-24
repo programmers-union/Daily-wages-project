@@ -60,4 +60,3 @@ export default App;
 
 
 
-{/* <div id="wpm-app"><a data-client-id="66eac7ab28d802624400bf9d" href="https://wpmaps.com">WP Maps Locator Software</a></div> <script type="text/javascript"> var wpmaps_configs = { client_id: "66eac7ab28d802624400bf9d", publish_id: "66eac88328d802624400bfa0", template: "default", container: "wpm-app", lang: "en_US" }; </script> <script async type="text/javascript" src="https://stc.wpmaps.com/gmap/chunk.bundle.vendors~main.js?v=1.1"></script> <script async type="text/javascript" src="https://stc.wpmaps.com/gmap/bundle.main.js?v=1.1"></script> */}
