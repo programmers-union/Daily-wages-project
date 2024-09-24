@@ -1,11 +1,11 @@
 import axios from "axios";
-import  { createContext, useState, FC, useEffect } from "react";
+import React , { createContext, useState, useEffect } from "react";
 import { ChildrenNode } from "../../types/authTypes/AuthTypes";
 import { AdminFormData, AdminFormListData, EmployeeData, GetSubCategoryAndItems, Item } from "../../types/AdminGategoryType";
 
 const AdminFormContext = createContext<AdminFormListData | null>(null);
 
-export const AdminContext: FC<ChildrenNode> = ({ children }) => {
+export const AdminContext: React.FC<ChildrenNode> = ({ children }) => {
   const [mainCategoryId, setMainCategoryId] = useState<string>('');
   const [subCategoryId, setSubCategoryId] = useState<string>('');
   const [getSubCategoriesdata, setGetSubCategories] = useState<GetSubCategoryAndItems>([]);

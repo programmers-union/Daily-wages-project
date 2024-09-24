@@ -1,4 +1,4 @@
-import  { createContext, FC, ReactNode } from "react";
+import  { createContext, ReactNode } from "react";
 import { ClientAddFormData } from "../../types/ClientFormType";
 import axios from "axios";
 import {  createAxiosInstance } from "./Interceptor";
@@ -15,7 +15,7 @@ interface ClientProviderProps {
 // Initialize context with a default value or null
 const ClientContext = createContext<ClientContextType | null>(null);
 
-export const ClientProvider: FC<ClientProviderProps> = ({ children }) => {
+export const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
   const ClientCalendarAddForm = async (formData: ClientAddFormData) => {
     const axiosInstance = createAxiosInstance();
   console.log(formData,'formdata,...')
