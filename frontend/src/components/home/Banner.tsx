@@ -8,10 +8,12 @@ import Success from '../success/Success';
 import WorkerFormContext from '../../context/modules/WorkerFormData';
 import { WorkerFormStateType } from '../../types/WorkerTypes';
 
+
+
 const Banner: React.FC = () => {
   const [inputFocus, setInputFocus] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>(''); // State for input value
-  const [filteredItems, setFilteredItems] = useState<any[]>([]); // State for filtered items
+  const [filteredItems, setFilteredItems] = useState<Item[]>([]); // State for filtered items
   const inputRef = useRef<HTMLInputElement>(null);
 
   const context = useContext(AdminFormContext);
@@ -29,16 +31,21 @@ const Banner: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setInputValue(value);
-    if (passingCategoriesDataAllPage?.subCategoryItems) {
-      const filtered = passingCategoriesDataAllPage.subCategoryItems.filter((item: any) =>
+    if (typeof passingCategoriesDataAllPage === 'object' && 'subCategoryItems' in passingCategoriesDataAllPage) {
+      const filtered = ((passingCategoriesDataAllPage.subCategoryItems as unknown) as { jobTitle: string }[]).filter((item) =>
         item.jobTitle.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredItems(filtered);
     }
   };
 
+  // Define an interface for the item
+  interface Item {
+    jobTitle: string;
+  }
+
   // Handler for selecting an item from the dropdown
-  const handleSelectItem = (item: any) => {
+  const handleSelectItem = (item: Item) => {
     setInputValue(item.jobTitle); // Set the input value to the selected jobTitle
     setInputFocus(false); // Close the dropdown after selection
   };
@@ -89,7 +96,7 @@ const Banner: React.FC = () => {
         {inputFocus && (
           <ul className=' absolute bg-gray-100 max-h-40 h-fit overflow-y-auto w-1/2 flex flex-col pb-3 gap-1 border-l border-b border-r border-gray-400 rounded-br-2xl rounded-bl-2xl pt-2 -bottom-[87px]'>
             {filteredItems.length > 0 && (
-              filteredItems.map((item: any, index) => (
+              filteredItems.map((item: Item, index) => (
                 <li
                   key={index}
                   className='cursor-pointer border-b text-[11px] border-gray-200 py-1 px-6 hover:bg-gray-200'

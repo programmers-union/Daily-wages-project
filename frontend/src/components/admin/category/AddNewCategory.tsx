@@ -24,7 +24,7 @@ const AddNewCategory: React.FC<MainCategoryProps> = ({
     newSubCategory: "",
     jobTitle: "",
     description: "",
-    subCategoryId: undefined,
+    subCategoryId: "",
   });
 
   const { AdminFormAdding, mainCategoryId, getSubCategoriesdata } = useContext(
@@ -74,7 +74,7 @@ const AddNewCategory: React.FC<MainCategoryProps> = ({
     if (getSubCategoriesdata.length > 0 && getSubCategoriesdata[0][key]) {
       const items = getSubCategoriesdata[0][key].map((item: Item) => ({
         name: item.name,
-        subId: item.subCategoryId,
+        subId: item.subCategoryId ,
       }));
       setGetSubCategories(items);
     }
@@ -241,7 +241,7 @@ const AddNewCategory: React.FC<MainCategoryProps> = ({
                             setFormData({
                               ...formData,
                               subCategory: subCat.name,
-                              subCategoryId: subCat.subId,
+                              subCategoryId:subCat.subId ? subCat.subId.name : "",
                             });
                             setIsOpen(false);
                           }}

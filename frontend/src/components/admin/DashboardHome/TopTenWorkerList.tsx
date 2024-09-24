@@ -10,48 +10,11 @@ interface User {
 }
 
 const initialUsers: User[] = [
-  {
-    id: 1,
-    name: "John Doe",
-    profilePic: "https://randomuser.me/api/portraits/men/1.jpg",
-    place: "malappuram",
-    rating: 4.5,
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    profilePic: "https://randomuser.me/api/portraits/women/2.jpg",
-    place: "eranakulam",
-    rating: 3.8,
-  },
-  {
-    id: 3,
-    name: "Bob Johnson",
-    profilePic: "https://randomuser.me/api/portraits/men/3.jpg",
-    place: "wayanad",
-    rating: 3.2,
-  },
-  {
-    id: 4,
-    name: "Alice Brown",
-    profilePic: "https://randomuser.me/api/portraits/women/4.jpg",
-    place: "kottayam",
-    rating: 4.7,
-  },
-  {
-    id: 5,
-    name: "Charlie Davis",
-    profilePic: "https://randomuser.me/api/portraits/men/5.jpg",
-    place: "alappuzha",
-    rating: 3,
-  },
-  {
-    id: 6,
-    name: "Alice Brown",
-    profilePic: "https://randomuser.me/api/portraits/women/4.jpg",
-    place: "kottayam",
-    rating: 4.7,
-  },
+  { id: 1, name: "John Doe", profilePic: "https://randomuser.me/api/portraits/men/1.jpg", place: "malappuram", rating: 4.5 },
+  { id: 2, name: "Jane Smith", profilePic: "https://randomuser.me/api/portraits/women/2.jpg", place: "eranakulam", rating: 3.8 },
+  { id: 3, name: "Bob Johnson", profilePic: "https://randomuser.me/api/portraits/men/3.jpg", place: "wayanad", rating: 3.2 },
+  { id: 4, name: "Alice Brown", profilePic: "https://randomuser.me/api/portraits/women/4.jpg", place: "kottayam", rating: 4.7 },
+  { id: 5, name: "Charlie Davis", profilePic: "https://randomuser.me/api/portraits/men/5.jpg", place: "alappuzha", rating: 3 },
 ];
 
 const StarRating: React.FC<{ rating: number }> = ({ rating }) => {
@@ -60,9 +23,7 @@ const StarRating: React.FC<{ rating: number }> = ({ rating }) => {
       {[...Array(5)].map((_, i) => (
         <svg
           key={i}
-          className={`w-5 h-5 ${
-            i < Math.floor(rating) ? "text-yellow-400" : "text-gray-300"
-          }`}
+          className={`w-5 h-5 ${i < Math.floor(rating) ? "text-yellow-400" : "text-gray-300"}`}
           fill="currentColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +41,7 @@ const TopTenWorkerList: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const filterButtonRef = useRef<HTMLButtonElement>(null);
-  
+
   const handleClickOutside = (event: MouseEvent) => {
     if (
       dropdownRef.current &&
@@ -91,20 +52,20 @@ const TopTenWorkerList: React.FC = () => {
       setIsOpen(false);
     }
   };
-  
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  
+
   const handleMostRated = () => {
     const sortedUsers = [...users].sort((a, b) => b.rating - a.rating);
     setUsers(sortedUsers);
     setIsOpen(false);
   };
-  
+
   const handleLowRated = () => {
     const sortedUsers = [...users].sort((a, b) => a.rating - b.rating);
     setUsers(sortedUsers);
@@ -116,14 +77,14 @@ const TopTenWorkerList: React.FC = () => {
       <div className="flex items-center justify-between px-20 bg-gray-200 py-3 rounded-tl-lg relative rounded-tr-lg">
         <h6 className="uppercase text-sm text-center">User Name</h6>
         <h6 className="uppercase text-sm text-center">Rating</h6>
-        <div
+        <button
           ref={filterButtonRef}
           onClick={() => setIsOpen(!isOpen)}
           className="flex text-white items-center absolute top-2 left-2 bg-blue-400 cursor-pointer border border-gray-400 p-1 rounded-sm shadow-sm text-xs"
         >
           <CiFilter />
-          filter
-        </div>
+          Filter
+        </button>
       </div>
       <div className="bg-white shadow-sm border rounded-sm custom-scrollbar-container overflow-y-scroll h-[23rem]">
         <table className="w-full">
@@ -155,7 +116,9 @@ const TopTenWorkerList: React.FC = () => {
           </tbody>
         </table>
       </div>
-        <button className="textl-center border border-gray-300  w-full py-2 text-sm hover:text-blue-600">More Details</button>
+      <button className="text-center border border-gray-300 w-full py-2 text-sm hover:text-blue-600">
+        More Details
+      </button>
 
       {isOpen && (
         <div
@@ -165,20 +128,20 @@ const TopTenWorkerList: React.FC = () => {
           aria-orientation="vertical"
           aria-labelledby="options-menu"
         >
-          <div className="" role="none">
+          <div role="none">
             <button
-            onClick={handleMostRated}
+              onClick={handleMostRated}
               className="block px-4 border-b border-gray-300 py-2 text-sm text-gray-700 hover:bg-gray-200 w-full text-left"
               role="menuitem"
             >
-              Most Rate
+              Most Rated
             </button>
             <button
-            onClick={handleLowRated}
+              onClick={handleLowRated}
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 w-full text-left"
               role="menuitem"
             >
-              Low Rate
+              Low Rated
             </button>
           </div>
         </div>

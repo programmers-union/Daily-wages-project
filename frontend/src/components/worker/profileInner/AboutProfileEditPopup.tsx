@@ -42,7 +42,19 @@ const AboutProfileEditPopup: React.FC<ProfileEditModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    const cleanedData: ProfileData = {
+      firstName: formData.firstName ?? "",
+      lastName: formData.lastName ?? "",
+      email: formData.email ?? "",
+      phoneNumber: formData.phoneNumber ?? "",
+      dateOfBirth: formData.dateOfBirth ?? "",
+      country: formData.country ?? "",
+      address: formData.address ?? "",
+      city: formData.city ?? "",
+      state: formData.state ?? "",
+    };
+    
+    onSave(cleanedData);
     setProfileDisplayData({
       firstName: formData.firstName,
       lastName: formData.lastName,
@@ -76,7 +88,7 @@ const AboutProfileEditPopup: React.FC<ProfileEditModalProps> = ({
                 className="text-xs bg-gray-200 p-2 rounded"
                 id="firstName"
                 name="firstName"
-                value={formData.firstName}
+                value={formData?.firstName ?? ""}
                 onChange={handleChange}
                 required
               />
@@ -87,7 +99,7 @@ const AboutProfileEditPopup: React.FC<ProfileEditModalProps> = ({
                 className="text-xs bg-gray-200 p-2 rounded"
                 id="lastName"
                 name="lastName"
-                value={formData.lastName}
+                value={formData.lastName ?? ""}
                 onChange={handleChange}
                 required
               />
@@ -99,7 +111,7 @@ const AboutProfileEditPopup: React.FC<ProfileEditModalProps> = ({
                 id="email"
                 name="email"
                 type="email"
-                value={formData.email}
+                value={formData.email ?? ""}
                 onChange={handleChange}
                 required
               />
@@ -110,7 +122,7 @@ const AboutProfileEditPopup: React.FC<ProfileEditModalProps> = ({
                 className="text-xs outline-none bg-gray-200 p-2"
                 id="phoneNumber"
                 name="phoneNumber"
-                value={formData.phoneNumber}
+                value={formData.phoneNumber ?? ""}
                 onChange={handleChange}
                 required
               />
@@ -122,7 +134,7 @@ const AboutProfileEditPopup: React.FC<ProfileEditModalProps> = ({
                 id="dateOfBirth"
                 name="dateOfBirth"
                 type="date"
-                value={formData.dateOfBirth}
+                value={formData.dateOfBirth ?? ""}
                 onChange={handleChange}
                 required
               />
@@ -133,7 +145,7 @@ const AboutProfileEditPopup: React.FC<ProfileEditModalProps> = ({
                 className="text-xs outline-none bg-gray-200 p-2"
                 id="country"
                 name="country"
-                value={formData.country}
+                value={formData.country ?? ""}
                 onChange={handleChange}
                 required
               />
@@ -144,7 +156,7 @@ const AboutProfileEditPopup: React.FC<ProfileEditModalProps> = ({
                 className="text-xs outline-none bg-gray-200 p-2"
                 id="address"
                 name="address"
-                value={formData.address}
+                value={formData.address ?? ""}
                 onChange={handleChange}
                 required
               />
@@ -155,7 +167,7 @@ const AboutProfileEditPopup: React.FC<ProfileEditModalProps> = ({
                 className="text-xs outline-none bg-gray-200 p-2"
                 id="city"
                 name="city"
-                value={formData.city}
+                value={formData.city ?? ""}
                 onChange={handleChange}
                 required
               />
@@ -166,7 +178,7 @@ const AboutProfileEditPopup: React.FC<ProfileEditModalProps> = ({
                 className="text-xs outline-none bg-gray-200 p-2"
                 id="state"
                 name="state"
-                value={formData.state}
+                value={formData.state ?? ""}
                 onChange={handleChange}
                 required
               />

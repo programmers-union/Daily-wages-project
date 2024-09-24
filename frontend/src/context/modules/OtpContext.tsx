@@ -7,6 +7,13 @@ import Success from "../../components/success/Success";
 
 const OtpContext = createContext<OtpContextType | undefined>(undefined);
 
+interface ResponseType {
+  data: {
+    accesstoken: string;
+    otpVerified: boolean;
+  };
+}
+
 const OtpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [forgotCheckBox, setForgotCheckBox] = useState<number>(0);
   const [isChangePassword, setIsChangePassword] = useState<boolean>(false);
@@ -22,10 +29,9 @@ const OtpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     [isCheckClientOrWorker]
   );
 
-  const handleResponse = (response:any) => {
+  const handleResponse = (response:ResponseType ) => {
     if (response && response.data) {
       const { accesstoken, otpVerified } = response.data;
-console.log(accesstoken,'$$$$$$$------------$$$$$$$$$$')
       if (typeof accesstoken === "string") {
         localStorage.setItem("accessToken", accesstoken);
       } else {

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import  { FC } from 'react';
 import { AuthProvider } from './modules/AuthContext';
 import { OtpProvider } from './modules/OtpContext';
 import { ChildrenNode } from '../types/authTypes/AuthTypes';

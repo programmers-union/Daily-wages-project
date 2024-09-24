@@ -6,7 +6,7 @@ export interface AdminFormData {
   jobTitle: string;
   newSubCategory: string;
   description: string;
-  subCategoryId: string | undefined;
+  subCategoryId: string  ;
 }
 
 export interface FormProgressProps {
@@ -50,7 +50,7 @@ export interface AdminFormListData {
   getSubCategoriesItemsDatas: Item[];
   setGetSubCategoriesItemsDatas: (values: Item[]) => void;
   getEmployeeFullData:EmployeeData[] 
-  passingCategoriesDataAllPage: Category;
+  passingCategoriesDataAllPage: Category | string[];
 }
 export interface MainCategoryProps {
   setActiveAddCategoryPopup: (active: boolean) => void;
@@ -58,8 +58,8 @@ export interface MainCategoryProps {
 
 export interface MainCategoryTableProps {
   setActiveAddCategoryPopup: (active: boolean) => void;
-  paginate: (page: number) => void;
-  currentPage: number;
+  setPaginate: ((page: number) => void);
+  currentPage: number ;
 }
 
 export interface CategoryItem {
