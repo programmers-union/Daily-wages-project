@@ -36,8 +36,8 @@ const CategoryListTable: React.FC<MainCategoryProps> = ({
     };
   }, []);
 
-  const formatDate = (isoDate: string) => {
-    const date = new Date(isoDate);
+  const formatDate = (isoDate: string | undefined) => {
+    const date = new Date(isoDate ?? "");
     const dd = String(date.getDate()).padStart(2, "0");
     const mm = String(date.getMonth() + 1).padStart(2, "0"); // January is 0!
     const yyyy = date.getFullYear();
@@ -62,7 +62,7 @@ const CategoryListTable: React.FC<MainCategoryProps> = ({
       <div className="sm:p-7 p-4">
         <TableFilter
           setActiveAddCategoryPopup={setActiveAddCategoryPopup}
-          paginate={paginate}
+          setPaginate={paginate}
           currentPage={currentPage}
         />
         <div className="custom-scrollbar-container overflow-x-auto border border-gray-100">

@@ -29,7 +29,7 @@ const EventPopup: React.FC<EventPopupProps> = ({ event, onClose, onEdit, onDelet
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setEditedEvent((prev) => ({
+    setEditedEvent(prev => ({
       ...prev,
       [name]: value,
     }));
@@ -38,30 +38,27 @@ const EventPopup: React.FC<EventPopupProps> = ({ event, onClose, onEdit, onDelet
   const handleSave = async () => {
     const axiosInstance = createAxiosInstance();
     try {
-      await axiosInstance.put(
-        `http://localhost:5000/api/admin/edit-calendar-items/${editedEvent.id}`,
-        {
-          title: editedEvent.title,
-          description: editedEvent.description,
-          location: editedEvent.location,
-          start: editedEvent.start,
-          end: editedEvent.end,
-        }
-      );
-      onEdit(editedEvent);
+      await axiosInstance.put(`http://localhost:5000/api/admin/edit-calendar-items/${editedEvent.id}`, {
+        title: editedEvent.title,
+        description: editedEvent.description,
+        location: editedEvent.location,
+        start: editedEvent.start,
+        end: editedEvent.end,
+      });
+      onEdit(editedEvent); // Update the parent component with the edited event
     } catch (error) {
       console.error('Error updating event:', error);
     }
     setIsEditing(false);
   };
 
-  const handleDelete = async (id: string) => {
-    onClose();
+  const handleDelete = async () => {
     const axiosInstance = createAxiosInstance();
     try {
-      await axiosInstance.delete(`http://localhost:5000/api/admin/delete-calendar-items/${id}`);
-      alert('deleted successfully')
-      onDelete(id);
+      await axiosInstance.delete(`http://localhost:5000/api/admin/delete-calendar-items/${event.id}`);
+      onDelete(event.id); // Update the parent component by removing the event
+      alert('Event deleted successfully');
+      onClose();
     } catch (error) {
       console.error('Error deleting event:', error);
     }
@@ -139,30 +136,27 @@ const EventPopup: React.FC<EventPopupProps> = ({ event, onClose, onEdit, onDelet
             )}
           </div>
         </div>
-        <div className="bg-gray-50 px-6 py-4 flex justify-between">
+        <div className="px-6 py-4 bg-gray-100 border-t flex justify-between">
           {isEditing ? (
             <button
+              className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
               onClick={handleSave}
-              className="flex items-center text-xs justify-center bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
             >
-              <PencilIcon className="h-5 w-5 mr-2" />
               Save
             </button>
           ) : (
             <button
+              className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600"
               onClick={() => setIsEditing(true)}
-              className="flex items-center text-xs justify-center bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              <PencilIcon className="h-4 w-4 mr-2" />
-              Edit
+              <PencilIcon className="h-5 w-5 inline-block" /> Edit
             </button>
           )}
           <button
-            onClick={() => handleDelete(event.id)}
-            className="flex items-center text-xs justify-center bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600"
+            onClick={handleDelete}
           >
-            <TrashIcon className="h-4 w-4 mr-2" />
-            Delete
+            <TrashIcon className="h-5 w-5 inline-block" /> Delete
           </button>
         </div>
       </div>

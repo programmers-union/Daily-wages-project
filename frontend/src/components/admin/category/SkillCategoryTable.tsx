@@ -4,6 +4,7 @@ import TableFilter from './TableFilter';
 
 const SkillCategoryTable: React.FC<MainCategoryProps> = ({setActiveAddCategoryPopup}) => {
     const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
+    const [paginate , setPaginate] = useState<number | null>(null);
 
     const TableHeadContent = [
         "Image",
@@ -69,7 +70,7 @@ const SkillCategoryTable: React.FC<MainCategoryProps> = ({setActiveAddCategoryPo
             status: "Completed",
         },
     ];
-  
+  console.log(paginate)
 
     return (  
             <div className="flex-grow bg-white dark:bg-gray-900 overflow-y-auto ">
@@ -123,7 +124,7 @@ const SkillCategoryTable: React.FC<MainCategoryProps> = ({setActiveAddCategoryPo
                         </div>
                     </div>
                     </div> */}
-                    <TableFilter  setActiveAddCategoryPopup={setActiveAddCategoryPopup} />
+                    <TableFilter  setPaginate={setPaginate} setActiveAddCategoryPopup={setActiveAddCategoryPopup} currentPage={0}  />
                     <div className="custom-scrollbar-container  overflow-x-auto border border-gray-100 ">
                         <div className="inline-block min-w-full">
                             <div className="overflow-hidden">

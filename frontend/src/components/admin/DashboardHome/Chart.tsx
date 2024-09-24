@@ -18,22 +18,23 @@ const Chart: React.FC = () => {
     ];
 
     // Map numbers to days of the week (or any other custom labels)
-    const yAxisLabelFormatter = (tick: number) => {
-        const dayMap = {
-            20: 'Mon',
-            40: 'Tue',
-            60: 'Wed',
-            80: 'Thu',
-            90: 'Fri',
-            120: 'Sat',
-            140: 'Sun',
-            160: 'Mon',
-            180: 'Tue',
-            200: 'Wed',
-            220: 'Thu',
-            240: 'Fri',
-        };
-        return dayMap[tick] || tick;
+    const dayMap: Record<number, string> = {
+        20: 'Mon',
+        40: 'Tue',
+        60: 'Wed',
+        80: 'Thu',
+        90: 'Fri',
+        120: 'Sat',
+        140: 'Sun',
+        160: 'Mon',
+        180: 'Tue',
+        200: 'Wed',
+        220: 'Thu',
+        240: 'Fri',
+    };
+
+    const yAxisLabelFormatter = (tick: number): string => {
+        return dayMap[tick] || tick.toString();
     };
 
     return (

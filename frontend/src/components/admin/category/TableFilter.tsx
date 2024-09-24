@@ -6,7 +6,7 @@ import {
 import AdminFormContext from "../../../context/modules/AdminFormContext";
 
 const TableFilter: React.FC<MainCategoryTableProps> = ({
-  setActiveAddCategoryPopup, paginate ,currentPage 
+  setActiveAddCategoryPopup, setPaginate ,currentPage 
 }) => {
   const [filterHandle, setFilterHandle] = useState<boolean>(false);
   const [getSubCategories, setGetSubCategories] = useState<string[]>([]);
@@ -22,13 +22,17 @@ const TableFilter: React.FC<MainCategoryTableProps> = ({
   useEffect(() => {
     if (mainCategoryId && getSubCategoriesdata.length > 0) {
       const key = mainCategoryId;
-      const items =
-        getSubCategoriesdata[0][key]?.map(
+      if (getSubCategoriesdata[0] && getSubCategoriesdata[0][key]) {
+        const items = getSubCategoriesdata[0][key]?.map(
           (item: { name: string }) => item.name
         ) || [];
-      setGetSubCategories(items);
+        setGetSubCategories(items);
+      } else {
+        console.error("Subcategories data not found for the selected category.");
+      }
     }
   }, [mainCategoryId, getSubCategoriesdata]);
+  
 
   const filterClickHandle = (item: string) => {
     setFilterClickSubCategory(item);
@@ -159,7 +163,7 @@ const TableFilter: React.FC<MainCategoryTableProps> = ({
           </button>
           <div className="ml-auto text-gray-500 text-xs sm:inline-flex hidden items-center">
             <span className="mr-3"> 2/ 4</span>
-            <button onClick={() => paginate(currentPage - 1)} className="inline-flex mr-2 items-center h-8 w-8 justify-center text-gray-400 rounded-md shadow border border-gray-200 dark:border-gray-800 leading-none py-0">
+            <button onClick={() => setPaginate(currentPage - 1 )} className="inline-flex mr-2 items-center h-8 w-8 justify-center text-gray-400 rounded-md shadow border border-gray-200 dark:border-gray-800 leading-none py-0">
               <svg
                 className="w-4"
                 viewBox="0 0 24 24"
@@ -172,7 +176,7 @@ const TableFilter: React.FC<MainCategoryTableProps> = ({
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
             </button>
-            <button onClick={() => paginate(currentPage + 1)} className="inline-flex items-center h-8 w-8 justify-center text-gray-400 rounded-md shadow border border-gray-200 dark:border-gray-800 leading-none py-0">
+            <button onClick={() => setPaginate(currentPage + 1)} className="inline-flex items-center h-8 w-8 justify-center text-gray-400 rounded-md shadow border border-gray-200 dark:border-gray-800 leading-none py-0">
               <svg
                 className="w-4"
                 viewBox="0 0 24 24"
