@@ -1,12 +1,12 @@
-import React from 'react'
-import Banner from '../../components/landingPage/Banner'
-import SechduleSection from '../../components/landingPage/SechduleSection'
+import LandingBanner from "../../components/landingPage/Banner"
+import Sechdule from "../../components/landingPage/SechduleSection"
 
-const Landing:React.FC = () => {
+
+const Landing = () => {
   return (
-    <div >
-      <Banner />
-      <SechduleSection />
+    <div>
+       < LandingBanner />
+       <Sechdule />
     </div>
   )
 }
