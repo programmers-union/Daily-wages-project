@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const SecondSection: React.FC = () => {
 
@@ -63,10 +64,12 @@ const SecondSection: React.FC = () => {
     <div className="h-screen ">
       <div className="px-28 mt-20 grid grid-cols-2 sm:grid-cols-3 gap-y-6 md:grid-cols-4 place-items-center my-10 lg:grid-cols-6">
         {workDetails.map((item,index)=>
-        <div key={index} className="w-fit">
+        <Link to='/categoryItemsDetails'>
+        <div key={index}  className="w-fit cursor-pointer">
           <img src={item.img} alt="" className="w-24 h-24 border border-gary-400 p-4 rounded-md " />
           <p className="text-sm text-center">{item.title}</p>
         </div>
+        </Link>
         )}
       </div>
     </div>

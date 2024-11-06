@@ -21,11 +21,12 @@ import WorkerList from "./components/admin/workerDashboard/WorkerList";
 import Profile from "./components/worker/WorkerProfile";
 import "../src/style/animationCss.css";
 import "./App.css";
+import CategoryItemsDataDetails from "./components/home/CategoryItemsDataDetails";
 
 const App: React.FC = () => {
   const usepath = useLocation().pathname;
   const HomeNav =
-    usepath === "/home" || usepath === "/profile" || usepath === '/client-calendar' ? (
+    usepath === "/home" || usepath === "/profile" || usepath === '/client-calendar' || usepath === '/categoryItemsDetails' ? (
       <HomeNavBar />
     ) : usepath === "/" ? (
       <LandingNavBar />
@@ -37,6 +38,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/categoryItemsDetails" element={<CategoryItemsDataDetails />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/worker-calendar" element={<WorkerCalendar />} />

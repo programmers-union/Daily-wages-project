@@ -72,7 +72,7 @@ const ClientCalendar: React.FC = () => {
       }
     };
     getCalendarDate();
-  }, [axiosInstance]);
+  }, []);
 
   useEffect(() => {
     const getMainCategory = async () => {

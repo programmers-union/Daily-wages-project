@@ -36,19 +36,20 @@ interface VerifyTokenResult {
     payload: JwtPayload | null;
     error: string | null;
   }
+
 export const verifyToken = (token: string, secret: string): VerifyTokenResult => {
-    try {
-      const decoded = jwt.verify(token, secret) as JwtPayload;
-      return { payload: decoded, error: null };
-    } catch (error) {
-      if (error instanceof TokenExpiredError) {
-        console.error("Token verification failed: Token expired at", error.expiredAt);
-        return { payload: null, error: "TokenExpiredError" };
-      }
-      console.error("Token verification failed:", error);
-      return { payload: null, error: "InvalidTokenError" };
+  try {
+    const decoded = jwt.verify(token, secret) as JwtPayload;
+    return { payload: decoded, error: null };
+  } catch (error) {
+    if (error instanceof TokenExpiredError) {
+      console.error("Token verification failed: Token expired at.....", error.expiredAt);
+      return { payload: null, error: "TokenExpiredError" };
     }
-  };
+    console.error("Token verification failed:", error);
+    return { payload: null, error: "InvalidTokenError" };
+  }
+};
 
 
 export const getUserIdFromToken = (token: string): string | null => {

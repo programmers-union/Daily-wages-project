@@ -128,7 +128,6 @@ export const loginMailCheck = async (
         email: profileData.email,
         phoneNumber: profileData.phoneNumber,
       };
-  
       let employeeForm = null;
       if (employeeData) {
         employeeForm = await EmployeeForm.findOne({ email: employeeData.email });
@@ -157,27 +156,37 @@ export const loginMailCheck = async (
     console.log("REFRESH_TOKEN_SECRET:", secret);
   
     if (!secret) {
-      return res
-        .status(500)
-        .json({ message: "Server configuration error. No secret defined." });
+      return res.status(500).json({ message: "Server configuration error. No secret defined." });
     }
   
-    const payload = verifyToken(refreshToken, secret);
+    const { payload, error } = verifyToken(refreshToken, secret);
   
-    if (!payload || typeof payload !== "object" || !("userId" in payload)) {
+    // Check for token errors and proceed if TokenExpiredError
+    if (error && error !== "TokenExpiredError") {
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+  
+    // Ensure payload has userId
+    if (!payload || !("userId" in payload)) {
       return res.status(403).json({ message: "Invalid refresh token" });
     }
   
     try {
       const client = await Client.findById(payload.userId);
       const employee = await Employee.findById(payload.userId);
-      const idData = client  || employee 
-
+      console.log(client,'client')
+      console.log(employee,'employee')
+      const idData = client || employee;
+      console.log(idData,'idData')
+  
       if (!idData || idData.refreshToken !== refreshToken) {
+        console.log('refresh errorr ..........**')
         return res.status(403).json({ message: "Invalid refresh token" });
       }
   
+      // Generate new access token if refresh token is valid
       const newAccessToken = generateAccessToken(idData._id);
+      console.log(newAccessToken,'newAccessToken')
       return res.json({ accessToken: newAccessToken });
     } catch (error) {
       next(error);
